@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { UserDto } from 'src/user/dto/create-user.dto';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 
@@ -7,7 +7,7 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   constructor(private readonly userService: UserService) {}
 
-  async signUp(createUserDto: CreateUserDto) {
+  async signUp(createUserDto: UserDto) {
     const { password, ...rest } = createUserDto;
 
     // Hash the password using bcrypt
