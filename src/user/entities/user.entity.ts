@@ -18,7 +18,7 @@ export class User {
   lastName: String;
 
   @Column()
-  userName: String;
+  username: String;
 
   @Column()
   email: String;

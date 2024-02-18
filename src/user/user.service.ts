@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
@@ -17,13 +17,25 @@ export class UserService {
     return await this.userRepo.save(user);
   }
 
-  async findAll(): Promise<User[]> {
-    return await this.userRepo.find();
+  async findAll(): Promise<Omit<User, 'password'>[]> {
+    const allUsers = await this.userRepo.find();
+
+    const usersWithoutPasswords = allUsers.map(({ password, ...rest }) => rest);
+
+    return usersWithoutPasswords;
   }
 
-  async findOne(userName: string) {
-    this.userRepo.findOneBy({ userName });
-    return `This action returns a #${userName} user`;
+  async findOne(username: string): Promise<Omit<User, 'password'>> {
+    const foundUser = await this.userRepo.findOneBy({ username });
+
+    if (!foundUser)
+      throw new NotFoundException(
+        'Whoopsie! 🧙‍♂️ No magic user here! Stir up some registration potion and join the fun. See you in the enchanted user realm! ✨',
+      );
+
+    const { password, ...rest } = foundUser;
+
+    return foundUser;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
