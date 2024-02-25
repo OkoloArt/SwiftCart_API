@@ -5,7 +5,6 @@ import { User } from 'src/user/entities/user.entity';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
