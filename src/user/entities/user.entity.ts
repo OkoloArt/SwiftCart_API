@@ -9,22 +9,22 @@ import {
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: Number;
+  id: number;
 
   @Column()
-  firstName: String;
+  firstName: string;
 
   @Column()
-  lastName: String;
+  lastName: string;
 
   @Column()
-  username: String;
+  username: string;
 
   @Column()
-  email: String;
+  email: string;
 
   @Column()
-  password: String;
+  password: string;
 
   @CreateDateColumn()
   createdAt: Date;

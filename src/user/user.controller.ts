@@ -8,12 +8,16 @@ import {
   Delete,
   ValidationPipe,
   ParseIntPipe,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
+import { User } from './entities/user.entity';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -27,21 +31,33 @@ export class UserController {
   //   return this.userService.findAll();
   // }
 
-  @Get(':username')
-  findOne(@Param('username') username: string) {
-    return this.userService.findOne(username);
+  // @Get(':username')
+  // findOne(@Param('username') username: string) {
+  //   return this.userService.findOne(username);
+  // }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me/:username')
+  getProfile(@Request() req) {
+    return req.user;
   }
+
+  // @UseGuards(JwtAuthGuard)
+  // @Get('me/:username')
+  // getProfile(@Param('username') username: string) {
+  //   return this.userService.getCurrentUser(username);
+  // }
 
   @Patch(':id')
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') username: string,
     @Body(ValidationPipe) updateUserDto: UpdateUserDto,
   ) {
-    return this.userService.update(id, updateUserDto);
+    return this.userService.update(username, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.remove(id);
+  remove(@Param('id') username: string) {
+    return this.userService.remove(username);
   }
 }

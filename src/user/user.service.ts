@@ -25,7 +25,20 @@ export class UserService {
     return usersWithoutPasswords;
   }
 
-  async findOne(username: string): Promise<Omit<User, 'password'>> {
+  async findOne(username: string): Promise<User> {
+    const foundUser = await this.userRepo.findOneBy({ username });
+
+    if (!foundUser)
+      throw new NotFoundException(
+        'Whoopsie! 🧙‍♂️ No magic user here! Stir up some registration potion and join the fun. See you in the enchanted user realm! ✨',
+      );
+
+    // const { password, ...rest } = foundUser;
+
+    return foundUser;
+  }
+
+  async getCurrentUser(username: string): Promise<Omit<User, 'password'>> {
     const foundUser = await this.userRepo.findOneBy({ username });
 
     if (!foundUser)
@@ -35,14 +48,28 @@ export class UserService {
 
     const { password, ...rest } = foundUser;
 
-    return foundUser;
+    return rest;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(
+    username: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<Omit<User, 'password'>> {
+    const user = await this.findOne(username);
+    Object.assign(user, updateUserDto);
+    return this.userRepo.save(user);
   }
 
-  async remove(id: number) {
+  async updatePassword(
+    username: string,
+    password: string,
+  ): Promise<Omit<User, 'password'>> {
+    const user = await this.findOne(username);
+    user.password = password;
+    return this.userRepo.save(user);
+  }
+
+  async remove(id: string) {
     return `This action removes a #${id} user`;
   }
 }
