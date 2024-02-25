@@ -1,7 +1,7 @@
 import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserDto } from 'src/user/dto/create-user.dto';
-import { LoginDto } from './dto/login.dto';
+import { AuthCredentialDto } from './dto/auth-credential.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -13,5 +13,12 @@ export class AuthController {
   }
 
   @Post('login')
-  login(@Body(ValidationPipe) loginDto: LoginDto) {}
+  login(@Body(ValidationPipe) authCredDto: AuthCredentialDto) {
+    return this.authService.login(authCredDto);
+  }
+
+  @Post('reset-password')
+  resetPassword(@Body(ValidationPipe) authCredDto: AuthCredentialDto) {
+    return this.authService.passwordReset(authCredDto);
+  }
 }
