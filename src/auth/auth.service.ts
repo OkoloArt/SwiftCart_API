@@ -1,11 +1,19 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { UserDto } from 'src/user/dto/create-user.dto';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
-import { AuthCredentialDto } from './dto/auth-credential.dto';
+import {
+  LoginCredentialDto,
+  ResetCredentialDto,
+} from './dto/auth-credential.dto';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/user/entities/user.entity';
-import { UpdateUserDto } from 'src/user/dto/update-user.dto';
+import { PasswordUpdateDto, UpdateUserDto } from 'src/user/dto/update-user.dto';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class AuthService {
@@ -15,61 +23,77 @@ export class AuthService {
   ) {}
 
   async register(userDto: UserDto) {
-    const { password, ...rest } = userDto;
+    try {
+      const { password, ...rest } = userDto;
 
-    // Hash the password using bcrypt
-    const hashPassword = await bcrypt.hash(password, 10);
-    const user = this.userService.create({ ...rest, password: hashPassword });
+      // Hash the password using bcrypt
+      const hashPassword = await bcrypt.hash(password, 10);
+      await this.userService.create({ ...rest, password: hashPassword });
 
-    return user;
+      return rest;
+    } catch (error) {
+      throw new Error('Failed to register user');
+    }
   }
 
-  async login(authCredDto: AuthCredentialDto) {
-    const { username, password } = authCredDto;
+  async login(loginCredDto: LoginCredentialDto) {
+    const { username, password } = loginCredDto;
 
     const user = await this.userService.findOne(username);
     const userPasswordMatch = await bcrypt.compare(password, user.password);
 
     if (!userPasswordMatch) {
-      throw new NotAcceptableException(
+      throw new ConflictException(
         "Oops, looks like your password is playing hide and seek, but it's not winning! Try again, and let's see if we can outsmart it together!",
       );
     }
 
-    return this.loginToken(user);
+    const token = this.generateToken(user);
+    return {
+      message: 'Login successful',
+      access_token: token,
+    };
   }
 
-  private loginToken(user: User) {
+  private generateToken(user: User) {
     const payload = {
       username: user.username,
       sub: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
     };
-    return {
-      message: 'Login successful',
-      access_token: this.jwtService.sign(payload),
-    };
+    return this.jwtService.sign(payload);
   }
 
   async passwordReset(
-    authCredDto: AuthCredentialDto,
-  ): Promise<{ success: boolean; message: string }> {
-    const { username, password, confirmPassword } = authCredDto;
+    resetCredDto: ResetCredentialDto,
+  ): Promise<{ message: string; access_token: string }> {
+    const { username, password, confirmPassword } = resetCredDto;
+
+    const user = await this.userService.findOne(username);
 
     if (password !== confirmPassword) {
-      throw new NotAcceptableException(
+      throw new ConflictException(
         "Oopsie-daisy! It seems like these passwords are playing hide-and-seek, but they're definitely not a matchy-matchy pair. Let's try that again, shall we? 😄",
       );
     }
 
-    // Hash the password using bcrypt
-    const hashPassword = await bcrypt.hash(password, 10);
-    await this.userService.updatePassword(username, hashPassword);
+    try {
+      // Hash the password using bcrypt
+      const hashPassword = await bcrypt.hash(password, 10);
+      const updatePassword = {
+        password: hashPassword,
+      };
+      const updateUserDto = plainToClass(PasswordUpdateDto, updatePassword);
+      await this.userService.update(username, updateUserDto);
+    } catch (error) {
+      throw new InternalServerErrorException('Error resetting password');
+    }
 
+    const token = this.generateToken(user);
     return {
-      success: true,
       message: 'Password reset successful',
+      access_token: token,
     };
   }
 }

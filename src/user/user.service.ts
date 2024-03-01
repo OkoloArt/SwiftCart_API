@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { PasswordUpdateDto, UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -12,9 +17,23 @@ export class UserService {
     private readonly userRepo: Repository<User>,
   ) {}
 
-  async create(userDto: UserDto): Promise<User> {
+  async create(
+    userDto: UserDto,
+  ): Promise<{ status: number; message: string; user: User }> {
+    const { email } = userDto;
+    const userExists = await this.findUserByEmail(email);
+
+    if (userExists) {
+      throw new ConflictException('Email already exists');
+    }
+
     const user = this.userRepo.create(userDto);
-    return await this.userRepo.save(user);
+    const newUser = await this.userRepo.save(user);
+    return {
+      status: 200,
+      message: 'User was created successfully',
+      user: newUser,
+    };
   }
 
   async findAll(): Promise<Omit<User, 'password'>[]> {
@@ -53,23 +72,40 @@ export class UserService {
 
   async update(
     username: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<Omit<User, 'password'>> {
+    updateUserDto: UpdateUserDto | PasswordUpdateDto,
+  ): Promise<{ message: string; user: Omit<User, 'password'> }> {
     const user = await this.findOne(username);
-    Object.assign(user, updateUserDto);
-    return this.userRepo.save(user);
+
+    if ('password' in updateUserDto) {
+      // Handle password update logic
+      user.password = updateUserDto.password;
+    } else {
+      // Handle non-password update logic
+      Object.assign(user, updateUserDto);
+    }
+
+    const updatedUser = await this.userRepo.save(user);
+    const { password, ...rest } = updatedUser;
+
+    return {
+      message: 'User was updated successfully',
+      user: rest,
+    };
   }
 
-  async updatePassword(
+  async remove(
     username: string,
-    password: string,
-  ): Promise<Omit<User, 'password'>> {
-    const user = await this.findOne(username);
-    user.password = password;
-    return this.userRepo.save(user);
+  ): Promise<{ status: boolean; message: string }> {
+    const userToDelete = await this.findOne(username);
+
+    await this.userRepo.remove(userToDelete);
+    return {
+      status: true,
+      message: 'User was deleted successfully',
+    };
   }
 
-  async remove(id: string) {
-    return `This action removes a #${id} user`;
+  async findUserByEmail(email: string) {
+    return this.userRepo.findOneBy({ email });
   }
 }
