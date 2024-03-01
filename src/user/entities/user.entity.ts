@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   CreateDateColumn,
@@ -12,23 +13,30 @@ export class User {
   id: number;
 
   @Column()
+  @ApiProperty()
   firstName: string;
 
   @Column()
+  @ApiProperty()
   lastName: string;
 
   @Column()
+  @ApiProperty()
   username: string;
 
   @Column()
+  @ApiProperty()
   email: string;
 
   @Column()
+  @ApiProperty()
   password: string;
 
   @CreateDateColumn()
+  @ApiProperty()
   createdAt: Date;
 
   @UpdateDateColumn()
+  @ApiProperty()
   updatedAt: Date;
 }
