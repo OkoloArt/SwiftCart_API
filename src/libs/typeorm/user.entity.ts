@@ -1,17 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity } from 'typeorm';
+import { Base } from './base.entity';
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class User extends Base {
   @Column()
   @ApiProperty()
   firstName: string;
@@ -31,12 +23,4 @@ export class User {
   @Column()
   @ApiProperty()
   password: string;
-
-  @CreateDateColumn()
-  @ApiProperty()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  @ApiProperty()
-  updatedAt: Date;
 }

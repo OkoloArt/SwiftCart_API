@@ -3,16 +3,16 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { UserDto } from 'src/user/dto/create-user.dto';
+import { UserDto } from 'src/libs/dto/create-user.dto';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import {
   LoginCredentialDto,
   ResetCredentialDto,
-} from './dto/auth-credential.dto';
+} from '../libs/dto/auth-credential.dto';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/user/entities/user.entity';
-import { PasswordUpdateDto, UpdateUserDto } from 'src/user/dto/update-user.dto';
+import { User } from 'src/libs/typeorm/user.entity';
+import { PasswordUpdateDto, UpdateUserDto } from 'src/libs/dto/update-user.dto';
 import { plainToClass } from 'class-transformer';
 
 @Injectable()

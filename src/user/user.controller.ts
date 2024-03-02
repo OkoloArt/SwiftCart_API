@@ -12,10 +12,10 @@ import {
   Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UserDto } from '../libs/dto/create-user.dto';
+import { UpdateUserDto } from '../libs/dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
-import { User } from './entities/user.entity';
+import { User } from '../libs/typeorm/user.entity';
 import {
   ApiBearerAuth,
   ApiBody,

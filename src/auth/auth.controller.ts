@@ -1,10 +1,10 @@
 import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserDto } from 'src/user/dto/create-user.dto';
+import { UserDto } from 'src/libs/dto/create-user.dto';
 import {
   LoginCredentialDto,
   ResetCredentialDto,
-} from './dto/auth-credential.dto';
+} from '../libs/dto/auth-credential.dto';
 import {
   ApiBody,
   ApiCreatedResponse,

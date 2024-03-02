@@ -3,10 +3,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { UserDto } from './dto/create-user.dto';
-import { PasswordUpdateDto, UpdateUserDto } from './dto/update-user.dto';
+import { UserDto } from '../libs/dto/create-user.dto';
+import { PasswordUpdateDto, UpdateUserDto } from '../libs/dto/update-user.dto';
 import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+import { User } from '../libs/typeorm/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 
