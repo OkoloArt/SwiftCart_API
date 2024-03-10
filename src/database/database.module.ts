@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/libs/typeorm/user.entity';
+import entities from 'src/libs/typeorm';
 
 @Module({
   imports: [
@@ -15,9 +15,9 @@ import { User } from 'src/libs/typeorm/user.entity';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [User],
+        entities,
         ssl: {
-          rejectUnauthorized: false, // Set to true in production for a secure connection
+          rejectUnauthorized: true, // Set to true in production for a secure connection
         },
         connection: {
           options: `project=${configService.get('ENDPOINT_ID')}`,
