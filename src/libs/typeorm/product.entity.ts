@@ -19,15 +19,19 @@ export class Product extends Base {
 
   @Column() @ApiProperty() quantity: number;
 
-  @Column({ type: 'jsonb' }) @ApiProperty() images: string[];
+  @Column({ type: 'jsonb', nullable: true }) @ApiProperty() images: string[];
 
-  @Column({ type: 'jsonb' }) @ApiProperty() attributes: Attribute[];
+  @Column({ type: 'jsonb', nullable: true })
+  @ApiProperty()
+  attributes: Attribute[];
 
-  @Column({ type: 'jsonb' }) @ApiProperty() specifications: Specification;
+  @Column({ type: 'jsonb', nullable: true })
+  @ApiProperty()
+  specifications: Specification;
 
-  @Column({ type: 'jsonb' }) @ApiProperty() ratings: Rating;
+  @Column({ type: 'jsonb', nullable: true }) @ApiProperty() ratings: Rating;
 
-  @Column({ type: 'jsonb' }) @ApiProperty() reviews: Review[];
+  @Column({ type: 'jsonb', nullable: true }) @ApiProperty() reviews: Review[];
 
   @ManyToOne(() => User, (user) => user.products, { nullable: true })
   user: User;
