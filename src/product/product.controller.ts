@@ -7,13 +7,13 @@ import {
   Param,
   Delete,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from '../libs/dto/create-product.dto';
 import { UpdateProductDto } from '../libs/dto/update-product.dto';
 import {
   ApiBearerAuth,
-  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -35,17 +35,21 @@ export class ProductController {
     description:
       'Unable to access if the user isn\'t a "SELLER" or missing a JWT ',
   })
-  @Post(':userId')
-  create(
-    @Param('userId') userId: string,
-    @Body() createProductDto: CreateProductDto,
-  ) {
-    return this.productService.create(userId, createProductDto);
+  @Post()
+  addProduct(@Request() req: any, @Body() createProductDto: CreateProductDto) {
+    const { id } = req.user;
+    return this.productService.create(id, createProductDto);
   }
 
+  @ApiOperation({
+    summary: 'Get the list of all product and the associated user',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unable to access if JWT is missing ',
+  })
   @Get()
-  findAll() {
-    return this.productService.findAll();
+  getAllProduct() {
+    return this.productService.getAllProduct();
   }
 
   @Get('current/:id')
