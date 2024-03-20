@@ -63,12 +63,12 @@ export class UserController {
   @ApiOkResponse({
     description: 'High-five! Your mission? Totally aced it! 🚀',
   })
-  @Get('current/:username')
+  @Get(':username')
   getProfile(@Param('username') username: string) {
     return this.userService.getCurrentUser(username);
   }
 
-  @Patch('current/update/:username')
+  @Patch('update/:username')
   @ApiBearerAuth('Bearer')
   @ApiOperation({
     summary:
@@ -102,7 +102,7 @@ export class UserController {
       "Say goodbye to your digital doppelganger! Confirm only if you're ready to part ways with your virtual twin. 🚀👋",
   })
   @UseGuards(JwtAuthGuard)
-  @Delete('current/delete/:username')
+  @Delete('delete/:username')
   deleteCurrentUser(@Param('username') username: string) {
     return this.userService.remove(username);
   }
