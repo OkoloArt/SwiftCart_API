@@ -3,21 +3,29 @@ import { Attribute } from '../interfaces/attribute.interface';
 import { Rating } from '../interfaces/rating.interface';
 import { Review } from '../interfaces/review.interface';
 import { Specification } from '../interfaces/specification.interface';
+import { IsBase64, IsNumber, IsObject, IsString } from 'class-validator';
+import { UploadImageDto } from './upload-image.dto';
 
 export class CreateProductDto {
-  @ApiProperty() name: string;
+  @ApiProperty() @IsString() name: string;
 
-  @ApiProperty() description: string;
+  @ApiProperty() @IsString() description: string;
 
-  @ApiProperty() price: number;
+  @ApiProperty() @IsNumber() price: number;
 
-  @ApiProperty() category: string;
+  @ApiProperty() @IsString() category: string;
 
-  @ApiProperty() quantity: number;
+  @ApiProperty() @IsNumber() quantity: number;
 
-  @ApiProperty() images?: string[];
+  @ApiProperty() @IsObject() attributes?: Attribute[];
 
-  @ApiProperty() attributes?: Attribute[];
+  @ApiProperty() @IsObject() specifications?: Specification;
+}
 
-  @ApiProperty() specifications?: Specification;
+export class CreateProductWithImageDto {
+  @ApiProperty({ type: CreateProductDto })
+  createProductDto: CreateProductDto;
+
+  @ApiProperty({ type: UploadImageDto })
+  uploadImageDto: UploadImageDto;
 }

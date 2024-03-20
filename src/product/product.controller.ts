@@ -8,10 +8,14 @@ import {
   Delete,
   UseGuards,
   Request,
+  UploadedFile,
+  UseInterceptors,
+  ParseFilePipe,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { CreateProductDto } from '../libs/dto/create-product.dto';
-import { UpdateProductDto } from '../libs/dto/update-product.dto';
+import { CreateProductWithImageDto } from '../libs/dto/create-product.dto';
+import { UpdateProductWithImageDto } from '../libs/dto/update-product.dto';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -19,13 +23,39 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
+import { ReviewProductDto } from 'src/libs/dto/review.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
-@ApiBearerAuth('Bearer')
-@UseGuards(JwtAuthGuard)
 @ApiTags('Product Manager')
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
+
+  // @ApiOperation({
+  //   summary:
+  //     "Create a new product. Note that only user with the 'SELLER' role can post a new product",
+  // })
+  // @ApiUnauthorizedResponse({
+  //   description:
+  //     'Unable to access if the user isn\'t a "SELLER" or missing a JWT ',
+  // })
+  // @ApiBearerAuth('Bearer')
+  // @UseGuards(JwtAuthGuard)
+  // @Post('add-product')
+  // @UseInterceptors(FileInterceptor('image'))
+  // addProduct(
+  //   @Request() req: any,
+  //   @Body() createProductDto: CreateProductDto,
+  //   @UploadedFile(
+  //     new ParseFilePipe({
+  //       validators: [new FileTypeValidator({ fileType: 'image/jpeg' })],
+  //     }),
+  //   )
+  //   image: Express.Multer.File,
+  // ) {
+  //   const { id } = req.user;
+  //   return this.productService.create(id, createProductDto, image);
+  // }
 
   @ApiOperation({
     summary:
@@ -35,10 +65,16 @@ export class ProductController {
     description:
       'Unable to access if the user isn\'t a "SELLER" or missing a JWT ',
   })
-  @Post()
-  addProduct(@Request() req: any, @Body() createProductDto: CreateProductDto) {
+  @ApiBearerAuth('Bearer')
+  @UseGuards(JwtAuthGuard)
+  @Post('add-product')
+  addProduct(
+    @Request() req: any,
+    @Body() createProductWithImageDto: CreateProductWithImageDto,
+  ) {
     const { id } = req.user;
-    return this.productService.create(id, createProductDto);
+    const { createProductDto, uploadImageDto } = createProductWithImageDto;
+    return this.productService.create(id, createProductDto, uploadImageDto);
   }
 
   @ApiOperation({
@@ -47,23 +83,63 @@ export class ProductController {
   @ApiUnauthorizedResponse({
     description: 'Unable to access if JWT is missing ',
   })
-  @Get()
+  @Get('all-products')
   getAllProduct() {
-    return this.productService.getAllProduct();
+    return this.productService.getAllProducts();
   }
 
-  @Get('current/:id')
-  findOne(@Param('id') id: string) {
-    return this.productService.findOne(+id);
+  @ApiBearerAuth('Bearer')
+  @UseGuards(JwtAuthGuard)
+  @Get('current/:productId')
+  getCurrentProduct(@Param('id') productId: number) {
+    return this.productService.getProduct(productId);
   }
 
-  @Patch('current/delete/:id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productService.update(+id, updateProductDto);
+  @ApiBearerAuth('Bearer')
+  @UseGuards(JwtAuthGuard)
+  @Patch('update/:productId')
+  updateProduct(
+    @Param('id') productId: number,
+    @Body() updateProductWithImageDto: UpdateProductWithImageDto,
+  ) {
+    const { updateProductDto, uploadImageDto } = updateProductWithImageDto;
+    return this.productService.update(
+      productId,
+      updateProductDto,
+      uploadImageDto,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productService.remove(+id);
+  @ApiBearerAuth('Bearer')
+  @UseGuards(JwtAuthGuard)
+  @Delete('delete/:productId')
+  deleteProduct(@Param('id') productId: number) {
+    return this.productService.remove(productId);
+  }
+
+  @ApiBearerAuth('Bearer')
+  @UseGuards(JwtAuthGuard)
+  @Post('add-review/:productId')
+  addProductReview(
+    @Param('id') productId: number,
+    @Request() req: any,
+    reviewProductDto: ReviewProductDto,
+  ) {
+    const { id } = req.user;
+    return this.productService.addReview(id, productId, reviewProductDto);
+  }
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('image'))
+  uploadImage(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new FileTypeValidator({ fileType: 'image/jpeg' })],
+      }),
+    )
+    image: Express.Multer.File,
+  ) {
+    const imageData = image.buffer.toString('base64');
+    return imageData;
   }
 }
