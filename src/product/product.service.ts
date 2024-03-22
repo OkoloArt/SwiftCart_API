@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -39,10 +40,25 @@ export class ProductService {
 
     const { base64 } = data;
 
+    if (!user.products) {
+      user.products = [];
+    }
+
     const imageUrl = await this.uploadProductImage(base64);
 
     const product = this.productRepo.create(createProductDto);
+
+    product.attributes = product.attributes || [];
+    product.specifications = product.specifications || {
+      dimensions: { length: 0, width: 0, height: 0 },
+      weight: 0,
+    };
+
     user.products.push(product);
+
+    if (!product.images) {
+      product.images = [];
+    }
 
     product.images.push(imageUrl);
 
@@ -121,23 +137,32 @@ export class ProductService {
     const user = await this.userService.findOne(userId);
     const product = await this.getProduct(productId);
 
-    const review: Review = {
-      user: user.username,
-      rating: userRating,
-      comment: userComment,
+    const existingReviewIndex = product.reviews?.findIndex(
+      (review) => review.user === user.username,
+    );
+
+    if (userRating > 10) {
+      throw new ConflictException('Rating cannot be more than 10');
+    }
+
+    if (existingReviewIndex !== -1) {
+      Object.assign(product.reviews[existingReviewIndex], {
+        rating: userRating,
+        comment: userComment,
+      });
+    } else {
+      const review: Review = {
+        user: user.username,
+        rating: userRating,
+        comment: userComment,
+      };
+      product.reviews = [...(product.reviews || []), review];
+    }
+
+    product.ratings = {
+      average: calculateAverageRating(product),
+      count: totalRatingCount(product),
     };
-
-    product.reviews.push(review);
-
-    const averageRating = calculateAverageRating(product);
-    const totalCount = totalRatingCount(product);
-
-    const rating: Rating = {
-      average: averageRating,
-      count: totalCount,
-    };
-
-    product.ratings = rating;
 
     await this.productRepo.save(product);
 
@@ -160,4 +185,6 @@ export class ProductService {
       throw new InternalServerErrorException('');
     }
   }
+
+  async clearReview() {}
 }

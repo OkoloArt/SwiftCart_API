@@ -63,8 +63,9 @@ export class UserController {
   @ApiOkResponse({
     description: 'High-five! Your mission? Totally aced it! 🚀',
   })
-  @Get(':username')
-  getProfile(@Param('username') username: string) {
+  @Get('current')
+  getProfile(@Request() req: any) {
+    const { username } = req.user;
     return this.userService.getCurrentUser(username);
   }
 

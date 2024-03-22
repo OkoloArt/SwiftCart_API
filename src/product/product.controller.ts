@@ -142,7 +142,7 @@ export class ProductController {
   @Post('add-review/:productId')
   @ApiOperation({
     summary:
-      'Add reviews such as ratings and comment to a product. only accessible by Users with a BUYER role',
+      "Add reviews such as ratings and comment to a product. only accessible by users with a 'BUYER' role",
   })
   @ApiUnauthorizedResponse({
     description: 'Unable to access if the user is missing a JWT ',
@@ -152,7 +152,7 @@ export class ProductController {
     @Request() req: any,
     @Body() reviewProductDto: ReviewProductDto,
   ) {
-    const { id } = req.user;
-    return this.productService.addReview(id, productId, reviewProductDto);
+    const { username } = req.user;
+    return this.productService.addReview(username, productId, reviewProductDto);
   }
 }
