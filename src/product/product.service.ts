@@ -53,13 +53,12 @@ export class ProductService {
       dimensions: { length: 0, width: 0, height: 0 },
       weight: 0,
     };
+    product.reviews = product.reviews || [];
+    product.ratings = product.ratings || { average: 0, count: 0 };
 
     user.products.push(product);
 
-    if (!product.images) {
-      product.images = [];
-    }
-
+    product.images = product.images || [];
     product.images.push(imageUrl);
 
     await this.productRepo.save(product);
@@ -122,10 +121,16 @@ export class ProductService {
     return this.productRepo.save(product);
   }
 
-  async remove(productId: number) {
-    const product = await this.productRepo.findOneBy({ id: productId });
+  async remove(userId: string, productId: number) {
+    const user = await this.userService.findOne(userId);
+    const product = await this.getProduct(productId);
+
+    if (user.username !== product.user.username) {
+      throw new ConflictException("You cannot delete that which isn't yours");
+    }
+
     await this.productRepo.remove(product);
-    return true;
+    return { message: 'Product was deleted successfully' };
   }
 
   async addReview(
@@ -137,12 +142,18 @@ export class ProductService {
     const user = await this.userService.findOne(userId);
     const product = await this.getProduct(productId);
 
+    if (user.username === product.user.username) {
+      throw new ConflictException('You cannot review your product');
+    }
+
     const existingReviewIndex = product.reviews?.findIndex(
       (review) => review.user === user.username,
     );
 
-    if (userRating > 10) {
-      throw new ConflictException('Rating cannot be more than 10');
+    if (userRating > 10 || userRating < 0) {
+      throw new ConflictException(
+        'Rating cannot be more than 10 or less than 0',
+      );
     }
 
     if (existingReviewIndex !== -1) {
@@ -185,6 +196,4 @@ export class ProductService {
       throw new InternalServerErrorException('');
     }
   }
-
-  async clearReview() {}
 }

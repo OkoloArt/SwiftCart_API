@@ -133,8 +133,9 @@ export class ProductController {
   @ApiUnauthorizedResponse({
     description: 'Unable to access if the user is missing a JWT ',
   })
-  deleteProduct(@Param('id') productId: number) {
-    return this.productService.remove(productId);
+  deleteProduct(@Param('id') productId: number, @Request() req: any) {
+    const { username } = req.user;
+    return this.productService.remove(username, productId);
   }
 
   @ApiBearerAuth('Bearer')
