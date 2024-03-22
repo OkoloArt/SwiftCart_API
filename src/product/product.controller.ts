@@ -84,12 +84,24 @@ export class ProductController {
     description: 'Unable to access if JWT is missing ',
   })
   @Get('all-products')
+  @ApiOperation({
+    summary: 'Return all product with the associated user',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unable to access if the user is missing a JWT ',
+  })
   getAllProduct() {
     return this.productService.getAllProducts();
   }
 
   @ApiBearerAuth('Bearer')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Return a comprehensive details of a product',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unable to access if the user is missing a JWT ',
+  })
   @Get('current/:productId')
   getCurrentProduct(@Param('id') productId: number) {
     return this.productService.getProduct(productId);
@@ -98,21 +110,29 @@ export class ProductController {
   @ApiBearerAuth('Bearer')
   @UseGuards(JwtAuthGuard)
   @Patch('update/:productId')
+  @ApiOperation({
+    summary: 'Update current product with new information',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unable to access if the user is missing a JWT ',
+  })
   updateProduct(
     @Param('id') productId: number,
     @Body() updateProductWithImageDto: UpdateProductWithImageDto,
   ) {
     const { updateProductDto, uploadImageDto } = updateProductWithImageDto;
-    return this.productService.update(
-      productId,
-      updateProductDto,
-      uploadImageDto,
-    );
+    return this.productService.update(productId, updateProductDto);
   }
 
   @ApiBearerAuth('Bearer')
   @UseGuards(JwtAuthGuard)
   @Delete('delete/:productId')
+  @ApiOperation({
+    summary: 'Delete a product',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unable to access if the user is missing a JWT ',
+  })
   deleteProduct(@Param('id') productId: number) {
     return this.productService.remove(productId);
   }
@@ -120,26 +140,19 @@ export class ProductController {
   @ApiBearerAuth('Bearer')
   @UseGuards(JwtAuthGuard)
   @Post('add-review/:productId')
+  @ApiOperation({
+    summary:
+      'Add reviews such as ratings and comment to a product. only accessible by Users with a BUYER role',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unable to access if the user is missing a JWT ',
+  })
   addProductReview(
     @Param('id') productId: number,
     @Request() req: any,
-    reviewProductDto: ReviewProductDto,
+    @Body() reviewProductDto: ReviewProductDto,
   ) {
     const { id } = req.user;
     return this.productService.addReview(id, productId, reviewProductDto);
-  }
-
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('image'))
-  uploadImage(
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [new FileTypeValidator({ fileType: 'image/jpeg' })],
-      }),
-    )
-    image: Express.Multer.File,
-  ) {
-    const imageData = image.buffer.toString('base64');
-    return imageData;
   }
 }

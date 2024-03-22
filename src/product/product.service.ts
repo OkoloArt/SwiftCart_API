@@ -16,6 +16,7 @@ import { calculateAverageRating, totalRatingCount } from 'src/utils';
 import { Rating } from 'src/libs/interfaces/rating.interface';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UploadImageDto } from 'src/libs/dto/upload-image.dto';
+import { SimpleUserInfo } from 'src/libs/interfaces/simple-user-info.interface';
 const sharp = require('sharp');
 
 @Injectable()
@@ -55,19 +56,15 @@ export class ProductService {
   }
 
   async getAllProducts() {
-    const products = await this.productRepo.find({
-      relations: {
-        user: true,
-      },
-    });
+    const products = await this.productRepo.find();
 
     const productWithMappedUser = products.map((product) => {
       return {
-        ...product,
-        user: {
-          name: product.user.username || '',
-          id: product.user.id || '',
-        },
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        ratings: (product.ratings && product.ratings.average) || 0,
+        image: product.images[0],
       };
     });
 
@@ -77,6 +74,9 @@ export class ProductService {
   async getProduct(productId: number): Promise<Product> {
     const product = await this.productRepo.findOne({
       where: { id: productId },
+      relations: {
+        user: true,
+      },
     });
 
     if (!product) {
@@ -85,22 +85,24 @@ export class ProductService {
       );
     }
 
-    return product;
+    const mappedProduct: Product = {
+      ...product,
+      user: {
+        username: (product.user && product.user.username) || '',
+        id: (product.user && product.user.id) || 0,
+      } as SimpleUserInfo,
+    };
+
+    return mappedProduct;
   }
 
-  async update(
-    productId: number,
-    updateProductDto: UpdateProductDto,
-    data: UploadImageDto,
-  ) {
+  async update(productId: number, updateProductDto: UpdateProductDto) {
     const product = await this.getProduct(productId);
 
-    const { base64 } = data;
-
-    const imageUrl = await this.uploadProductImage(base64);
+    // const { base64 } = data;
+    // const imageUrl = await this.uploadProductImage(base64);
 
     Object.assign(product, updateProductDto);
-    product.images.push(imageUrl);
     return this.productRepo.save(product);
   }
 
