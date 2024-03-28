@@ -22,7 +22,7 @@ import entities from 'src/libs/typeorm';
         connection: {
           options: `project=${configService.get('ENDPOINT_ID')}`,
         },
-        synchronize: true,
+        synchronize: false,
       }),
     }),
   ],

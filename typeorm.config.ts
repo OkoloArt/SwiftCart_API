@@ -1,0 +1,23 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+const path = require('path');
+const dotenv = require('dotenv');
+import entities from 'src/libs/typeorm';
+import { DataSource } from 'typeorm';
+
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+const { env } = process;
+
+export default new DataSource({
+  type: 'postgres',
+  host: env.DB_HOST as any,
+  port: env.DB_PORT as any,
+  username: env.DB_USERNAME as any,
+  password: env.DB_PASSWORD as any,
+  database: env.DB_NAME as any,
+  entities,
+  migrations: [`migrations/*{.ts,.js}`],
+  ssl: {
+    rejectUnauthorized: true, // You can set this to true in production after configuring SSL correctly
+  },
+});

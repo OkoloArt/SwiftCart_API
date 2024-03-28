@@ -45,6 +45,16 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Migration
+
+Please use npm to avoid errors
+
+Generate
+npm run generate-migration --name=CreateUser
+
+Run migration
+npm run run-migration
+
 ## Test
 
 ```bash
