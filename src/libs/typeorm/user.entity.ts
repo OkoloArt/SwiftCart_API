@@ -16,4 +16,6 @@ export class User extends Base {
   @Column() @ApiProperty() password: string;
 
   @OneToMany(() => Product, (product) => product.user) products: Product[];
+
+  @Column('jsonb', { nullable: true }) @ApiProperty() userCart: number[];
 }
