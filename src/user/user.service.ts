@@ -1,7 +1,9 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { UserDto } from '../libs/dto/create-user.dto';
 import { PasswordUpdateDto, UpdateUserDto } from '../libs/dto/update-user.dto';
@@ -9,12 +11,16 @@ import { Repository } from 'typeorm';
 import { User } from '../libs/typeorm/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { ProductService } from 'src/product/product.service';
+import { Product } from 'src/libs/typeorm/product.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    @Inject(forwardRef(() => ProductService))
+    private readonly productService: ProductService,
   ) {}
 
   async create(
@@ -107,5 +113,45 @@ export class UserService {
 
   async findUserByEmail(email: string) {
     return this.userRepo.findOneBy({ email });
+  }
+
+  async addToCart(username: string, productId: number) {
+    const user = await this.findOne(username);
+
+    user.userCart = user.userCart || [];
+    user.userCart.push(productId);
+
+    await this.userRepo.save(user);
+
+    return {
+      message: 'Added successfully',
+    };
+  }
+
+  async getProductsInCart(
+    username: string,
+  ): Promise<Product[] | { message: string }> {
+    const user = await this.findOne(username);
+    const product: Product[] = [];
+
+    if (user.userCart === null) {
+      return {
+        message:
+          "Oopsie! Your cart feels a bit lonely. Toss in a product and let's get this shopping party started",
+      };
+    }
+
+    if (user.userCart.length === 0) {
+      return {
+        message:
+          "Oopsie! Your cart feels a bit lonely. Toss in a product and let's get this shopping party started",
+      };
+    }
+
+    for (const productId of user.userCart) {
+      product.push(await this.productService.getProduct(productId));
+    }
+
+    return product;
   }
 }
