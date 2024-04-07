@@ -50,10 +50,10 @@ $ npm run start:prod
 Please use npm to avoid errors
 
 Generate
-npm run generate-migration --name=CreateUser
+npm run migration-generate --name=CreateUser
 
 Run migration
-npm run run-migration
+npm run migration-run
 
 ## Test
 

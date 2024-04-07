@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { Base } from './base.entity';
 import { Product } from './product.entity';
+import { ROLE } from '../enums/role.enum';
 
 @Entity()
 export class User extends Base {
@@ -18,4 +19,6 @@ export class User extends Base {
   @OneToMany(() => Product, (product) => product.user) products: Product[];
 
   @Column('jsonb', { nullable: true }) @ApiProperty() userCart: number[];
+
+  @Column('enum', { enum: ROLE, default: ROLE.BUYER }) userRole: ROLE;
 }
