@@ -8,10 +8,6 @@ import {
   Delete,
   UseGuards,
   Request,
-  UploadedFile,
-  UseInterceptors,
-  ParseFilePipe,
-  FileTypeValidator,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductWithImageDto } from '../libs/dto/create-product.dto';
@@ -24,38 +20,15 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import { ReviewProductDto } from 'src/libs/dto/review.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Roles } from 'src/utils/role.decorator';
+import { ROLE } from 'src/libs/enums/role.enum';
+import { RolesGuard } from 'src/auth/guard/role.guard';
 
 @ApiTags('Product Manager')
+@UseGuards(RolesGuard)
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
-
-  // @ApiOperation({
-  //   summary:
-  //     "Create a new product. Note that only user with the 'SELLER' role can post a new product",
-  // })
-  // @ApiUnauthorizedResponse({
-  //   description:
-  //     'Unable to access if the user isn\'t a "SELLER" or missing a JWT ',
-  // })
-  // @ApiBearerAuth('Bearer')
-  // @UseGuards(JwtAuthGuard)
-  // @Post('add-product')
-  // @UseInterceptors(FileInterceptor('image'))
-  // addProduct(
-  //   @Request() req: any,
-  //   @Body() createProductDto: CreateProductDto,
-  //   @UploadedFile(
-  //     new ParseFilePipe({
-  //       validators: [new FileTypeValidator({ fileType: 'image/jpeg' })],
-  //     }),
-  //   )
-  //   image: Express.Multer.File,
-  // ) {
-  //   const { id } = req.user;
-  //   return this.productService.create(id, createProductDto, image);
-  // }
 
   @ApiOperation({
     summary:
@@ -68,6 +41,7 @@ export class ProductController {
   @ApiBearerAuth('Bearer')
   @UseGuards(JwtAuthGuard)
   @Post('add-product')
+  @Roles(ROLE.SELLER)
   addProduct(
     @Request() req: any,
     @Body() createProductWithImageDto: CreateProductWithImageDto,

@@ -1,8 +1,10 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { CreateProductDto } from '../libs/dto/create-product.dto';
 import { UpdateProductDto } from '../libs/dto/update-product.dto';
@@ -14,7 +16,6 @@ import { User } from 'src/libs/typeorm/user.entity';
 import { ReviewProductDto } from 'src/libs/dto/review.dto';
 import { Review } from 'src/libs/interfaces/review.interface';
 import { calculateAverageRating, totalRatingCount } from 'src/utils';
-import { Rating } from 'src/libs/interfaces/rating.interface';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UploadImageDto } from 'src/libs/dto/upload-image.dto';
 import { SimpleUserInfo } from 'src/libs/interfaces/simple-user-info.interface';
@@ -27,6 +28,7 @@ export class ProductService {
     private readonly productRepo: Repository<Product>,
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly fileUploadService: FileUploadService,
   ) {}
