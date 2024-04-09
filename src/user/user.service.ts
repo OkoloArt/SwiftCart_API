@@ -13,6 +13,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { ProductService } from 'src/product/product.service';
 import { Product } from 'src/libs/typeorm/product.entity';
+import { SchedulerRegistry } from '@nestjs/schedule';
+import { CronJob } from 'cron';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class UserService {
@@ -21,6 +24,8 @@ export class UserService {
     private readonly userRepo: Repository<User>,
     @Inject(forwardRef(() => ProductService))
     private readonly productService: ProductService,
+    private readonly scheduleRegistry: SchedulerRegistry,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async create(
@@ -61,6 +66,16 @@ export class UserService {
     // const { password, ...rest } = foundUser;
 
     return foundUser;
+  }
+
+  async getUserById(id: string): Promise<User> {
+    const user = await this.userRepo.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(
+        'Whoopsie! 🧙‍♂️ No magic user here! Stir up some registration potion and join the fun. See you in the enchanted user realm! ✨',
+      );
+    }
+    return user;
   }
 
   async getCurrentUser(username: string): Promise<Omit<User, 'password'>> {
@@ -115,8 +130,8 @@ export class UserService {
     return this.userRepo.findOneBy({ email });
   }
 
-  async addToCart(username: string, productId: number) {
-    const user = await this.findOne(username);
+  async addToCart(userId: string, productId: string) {
+    const user = await this.getUserById(userId);
 
     user.userCart = user.userCart || [];
     user.userCart.push(productId);
@@ -129,9 +144,9 @@ export class UserService {
   }
 
   async getProductsInCart(
-    username: string,
+    userId: string,
   ): Promise<Product[] | { message: string }> {
-    const user = await this.findOne(username);
+    const user = await this.getUserById(userId);
     const product: Product[] = [];
 
     if (user.userCart === null) {
@@ -153,5 +168,50 @@ export class UserService {
     }
 
     return product;
+  }
+
+  async notifyUser(userId: string, shouldNotify: boolean) {
+    const user = await this.getUserById(userId);
+    const jobName = `${user.username}-notify`;
+
+    if (user.userCart === null) {
+      return {
+        message:
+          "Oopsie! Your cart feels a bit lonely. Toss in a product and let's get this shopping party started",
+      };
+    }
+
+    if (user.userCart.length === 0) {
+      return {
+        message:
+          "Oopsie! Your cart feels a bit lonely. Toss in a product and let's get this shopping party started",
+      };
+    }
+
+    if (shouldNotify) {
+      const job = new CronJob(`0 0 11 * * *`, async () => {
+        console.log(`Sending notification to user: ${userId}`);
+        this.notificationService.createNotification(
+          "Items are still in your cart! Ready to buy? Head to checkout whenever you're set. Happy shopping! 🎉",
+        );
+      });
+      this.scheduleRegistry.addCronJob(jobName, job as any);
+      job.start();
+
+      return {
+        message:
+          "User will be notified when there's an outstanding product(s) in cart",
+      };
+    } else {
+      const job = this.scheduleRegistry.getCronJob(jobName);
+      if (job) {
+        job.stop();
+        this.scheduleRegistry.deleteCronJob(jobName);
+      } else {
+        console.log(`No cron job found with the name: ${jobName}`);
+        // Handle this case as per your requirements
+      }
+      return { message: 'User notification stopped' }; // Return a message here
+    }
   }
 }

@@ -8,6 +8,7 @@ import {
   ValidationPipe,
   UseGuards,
   Request,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from '../libs/dto/update-user.dto';
@@ -114,12 +115,12 @@ export class UserController {
     summary: 'Toss that treasure into your virtual shopping chariot! 🛒💫',
   })
   @UseGuards(JwtAuthGuard)
-  @Get('addToCart')
+  @Get(':id/addToCart')
   addToCart(
-    @Param('username') username: string,
-    @Param('productId') productId: number,
+    @Param('userId') userId: string,
+    @Param('productId') productId: string,
   ) {
-    return this.userService.addToCart(username, productId);
+    return this.userService.addToCart(userId, productId);
   }
 
   @ApiBearerAuth('Bearer')
@@ -135,8 +136,29 @@ export class UserController {
       "Hey there, want a peek at your cart's loot? Here's the juicy list of goodies waiting for checkout! 🛒✨",
   })
   @UseGuards(JwtAuthGuard)
-  @Get('getProductsInCart')
-  getProductsInCart(@Param('username') username: string) {
-    return this.userService.getProductsInCart(username);
+  @Get(':id/getProductsInCart')
+  getProductsInCart(@Param('userId') userId: string) {
+    return this.userService.getProductsInCart(userId);
+  }
+
+  @ApiBearerAuth('Bearer')
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({
+    description: 'Send Notification',
+  })
+  @ApiUnauthorizedResponse({
+    description:
+      'Are you trying to hack my secrets without the secret handshake? Nice try, but no JWT, no entry!',
+  })
+  @ApiOperation({
+    summary: 'Sending notifications when there are items in the cart! 🛒✨',
+  })
+  @Get(':id/notify-user/:notify')
+  async sendNotification(
+    @Param('id') userId: string,
+    @Param('notify', ParseBoolPipe) shouldNotify: boolean,
+  ) {
+    // Call the appropriate method in the userService to send notification to user
+    return this.userService.notifyUser(userId, shouldNotify);
   }
 }
