@@ -8,8 +8,8 @@ import {
 
 export abstract class Base {
   @ApiProperty()
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ApiProperty()
   @CreateDateColumn()

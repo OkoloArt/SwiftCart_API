@@ -18,7 +18,9 @@ export class User extends Base {
 
   @OneToMany(() => Product, (product) => product.user) products: Product[];
 
-  @Column('jsonb', { nullable: true }) @ApiProperty() userCart: number[];
+  @Column('jsonb', { nullable: true }) @ApiProperty() userCart: string[];
 
   @Column('enum', { enum: ROLE, default: ROLE.BUYER }) userRole: ROLE;
+
+  @Column('boolean', { default: false }) @ApiProperty() hasSubcribed: boolean;
 }

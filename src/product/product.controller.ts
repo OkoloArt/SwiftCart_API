@@ -77,7 +77,7 @@ export class ProductController {
     description: 'Unable to access if the user is missing a JWT ',
   })
   @Get('current/:productId')
-  getCurrentProduct(@Param('id') productId: number) {
+  getCurrentProduct(@Param('id') productId: string) {
     return this.productService.getProduct(productId);
   }
 
@@ -91,7 +91,7 @@ export class ProductController {
     description: 'Unable to access if the user is missing a JWT ',
   })
   updateProduct(
-    @Param('id') productId: number,
+    @Param('id') productId: string,
     @Body() updateProductWithImageDto: UpdateProductWithImageDto,
   ) {
     const { updateProductDto, uploadImageDto } = updateProductWithImageDto;
@@ -107,7 +107,7 @@ export class ProductController {
   @ApiUnauthorizedResponse({
     description: 'Unable to access if the user is missing a JWT ',
   })
-  deleteProduct(@Param('id') productId: number, @Request() req: any) {
+  deleteProduct(@Param('id') productId: string, @Request() req: any) {
     const { username } = req.user;
     return this.productService.remove(username, productId);
   }
@@ -123,7 +123,7 @@ export class ProductController {
     description: 'Unable to access if the user is missing a JWT ',
   })
   addProductReview(
-    @Param('id') productId: number,
+    @Param('id') productId: string,
     @Request() req: any,
     @Body() reviewProductDto: ReviewProductDto,
   ) {

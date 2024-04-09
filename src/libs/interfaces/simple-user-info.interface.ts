@@ -6,5 +6,5 @@ export class SimpleUserInfo extends User {
   username: string;
 
   @ApiProperty()
-  id: number;
+  id: string;
 }

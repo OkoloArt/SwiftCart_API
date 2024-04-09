@@ -88,7 +88,7 @@ export class ProductService {
     return productWithMappedUser;
   }
 
-  async getProduct(productId: number): Promise<Product> {
+  async getProduct(productId: string): Promise<Product> {
     const product = await this.productRepo.findOne({
       where: { id: productId },
       relations: {
@@ -113,7 +113,7 @@ export class ProductService {
     return mappedProduct;
   }
 
-  async update(productId: number, updateProductDto: UpdateProductDto) {
+  async update(productId: string, updateProductDto: UpdateProductDto) {
     const product = await this.getProduct(productId);
 
     // const { base64 } = data;
@@ -123,7 +123,7 @@ export class ProductService {
     return this.productRepo.save(product);
   }
 
-  async remove(userId: string, productId: number) {
+  async remove(userId: string, productId: string) {
     const user = await this.userService.findOne(userId);
     const product = await this.getProduct(productId);
 
@@ -137,7 +137,7 @@ export class ProductService {
 
   async addReview(
     userId: string,
-    productId: number,
+    productId: string,
     reviewProductDto: ReviewProductDto,
   ) {
     const { userRating, userComment } = reviewProductDto;
