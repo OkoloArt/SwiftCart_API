@@ -10,6 +10,7 @@ import entities from './libs/typeorm';
 import { DatabaseModule } from './database/database.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/guard/role.guard';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { RolesGuard } from './auth/guard/role.guard';
     AuthModule,
     ProductModule,
     DatabaseModule,
+    ScheduleModule.forRoot(),
   ],
   providers: [
     FileUploadService,
