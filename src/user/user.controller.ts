@@ -141,8 +141,8 @@ export class UserController {
     return this.userService.getProductsInCart(userId);
   }
 
-  @ApiBearerAuth('Bearer')
-  @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth('Bearer')
+  // @UseGuards(JwtAuthGuard)
   @ApiOkResponse({
     description: 'Send Notification',
   })

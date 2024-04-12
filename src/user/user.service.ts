@@ -191,9 +191,11 @@ export class UserService {
     if (shouldNotify) {
       const job = new CronJob(`0 0 11 * * *`, async () => {
         console.log(`Sending notification to user: ${userId}`);
-        this.notificationService.createNotification(
-          "Items are still in your cart! Ready to buy? Head to checkout whenever you're set. Happy shopping! 🎉",
-        );
+        this.notificationService.createNotification({
+          userId: user.id,
+          message:
+            "Items are still in your cart! Ready to buy? Head to checkout whenever you're set. Happy shopping! 🎉",
+        });
       });
       this.scheduleRegistry.addCronJob(jobName, job as any);
       job.start();

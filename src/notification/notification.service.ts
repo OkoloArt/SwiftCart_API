@@ -1,13 +1,14 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { SocketGateway } from './socket.provider';
+import { NotificationDto } from 'src/libs/dto/notification.dto';
 
 @Injectable()
 export class NotificationService {
   constructor(private readonly socketGateway: SocketGateway) {}
 
-  async createNotification(messageData: string) {
+  async createNotification(data: NotificationDto) {
     try {
-      this.socketGateway.emitNotification(messageData);
+      this.socketGateway.emitNotification(data);
     } catch (error) {
       throw new InternalServerErrorException("Couldn't create notification");
     }

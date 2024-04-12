@@ -10,6 +10,7 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'http';
 import { Observable, from, map } from 'rxjs';
+import { NotificationDto } from 'src/libs/dto/notification.dto';
 
 @WebSocketGateway({
   cors: {
@@ -21,8 +22,9 @@ export class SocketGateway
 {
   @WebSocketServer() server: Server;
 
-  emitNotification(@MessageBody() data: string) {
-    this.server.emit('notification', data);
+  emitNotification(@MessageBody() data: NotificationDto) {
+    const { userId, message } = data;
+    this.server.emit(userId, message);
   }
 
   afterInit() {
