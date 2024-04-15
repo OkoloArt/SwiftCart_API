@@ -143,6 +143,27 @@ export class UserService {
     };
   }
 
+  async removeFromCart(userId: string, productId: string) {
+    const user = await this.getUserById(userId);
+
+    if (!user.userCart || user.userCart.length === 0) {
+      throw new Error('User cart is empty');
+    }
+
+    const index = user.userCart.findIndex((id) => id === productId);
+    if (index === -1) {
+      throw new Error('Product not found in user cart');
+    }
+
+    user.userCart.splice(index, 1);
+
+    await this.userRepo.save(user);
+
+    return {
+      message: 'Removed successfully',
+    };
+  }
+
   async getProductsInCart(
     userId: string,
   ): Promise<Product[] | { message: string }> {
