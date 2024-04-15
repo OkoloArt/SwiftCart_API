@@ -4,13 +4,11 @@ import { AuthModule } from './auth/auth.module';
 import { ProductModule } from './product/product.module';
 import { ConfigModule } from '@nestjs/config';
 import { FileUploadService } from './file-upload/file-upload.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { env } from 'process';
-import entities from './libs/typeorm';
 import { DatabaseModule } from './database/database.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/guard/role.guard';
 import { ScheduleModule } from '@nestjs/schedule';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -20,6 +18,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ProductModule,
     DatabaseModule,
     ScheduleModule.forRoot(),
+    PaymentModule,
   ],
   providers: [
     FileUploadService,
