@@ -2,6 +2,7 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   forwardRef,
 } from '@nestjs/common';
@@ -16,6 +17,9 @@ import { Product } from 'src/libs/typeorm/product.entity';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { NotificationService } from 'src/notification/notification.service';
+import { FileUploadService } from 'src/file-upload/file-upload.service';
+import { ProfileDto } from 'src/libs/dto/profile.dto';
+import { ImageData } from 'src/libs/interfaces/image-data.interface';
 
 @Injectable()
 export class UserService {
@@ -26,11 +30,12 @@ export class UserService {
     private readonly productService: ProductService,
     private readonly scheduleRegistry: SchedulerRegistry,
     private readonly notificationService: NotificationService,
+    private readonly fileUploadService: FileUploadService,
   ) {}
 
   async create(
     userDto: UserDto,
-  ): Promise<{ status: number; message: string; user: User }> {
+  ): Promise<{ status: number; message: string; }> {
     const { email } = userDto;
     const userExists = await this.findUserByEmail(email);
 
@@ -39,11 +44,10 @@ export class UserService {
     }
 
     const user = this.userRepo.create(userDto);
-    const newUser = await this.userRepo.save(user);
+  await this.userRepo.save(user);
     return {
       status: 200,
       message: 'User was created successfully',
-      user: newUser,
     };
   }
 
@@ -92,10 +96,10 @@ export class UserService {
   }
 
   async update(
-    username: string,
+    userId: string,
     updateUserDto: UpdateUserDto | PasswordUpdateDto,
   ): Promise<{ message: string; user: Omit<User, 'password'> }> {
-    const user = await this.findOne(username);
+    const user = await this.findOne(userId);
 
     if ('password' in updateUserDto) {
       // Handle password update logic
@@ -236,5 +240,63 @@ export class UserService {
       }
       return { message: 'User notification stopped' }; // Return a message here
     }
+  }
+
+
+  async setOrUpdateUserProfile(userId: string, data: ProfileDto) {
+    try {
+        const user = await this.getUserById(userId);
+
+        let imageData: ImageData
+
+        // Upload image if it's not null or empty
+        if (data.image !== '' && data.image !== null && data.image !== undefined) {
+            imageData = await this.uploadProfileImage(user.profile.imageKey, data.image);
+        }
+
+        // If user profile doesn't exist, create a new one
+        if (!user.profile) {
+            user.profile = {
+                address: data.address,
+                country: data.country,
+                mobileNo: Number(data.mobileNo),
+                gender: data.gender,
+                image: imageData?.imageUrl ?? user.profile.image,
+                imageKey: imageData?.imageKey ?? user.profile.imageKey,
+            };
+        } else {
+            // Update user profile with non-null or non-empty values
+            user.profile.image = imageData?.imageUrl ?? user.profile.image;
+            user.profile.imageKey = imageData?.imageKey ?? user.profile.imageKey;
+            user.profile.address = data.address ?? user.profile.address;
+            user.profile.country = data.country ?? user.profile.country;
+            user.profile.mobileNo = Number(data.mobileNo) ?? user.profile.mobileNo;
+            user.profile.gender = data.gender ?? user.profile.gender;
+        }
+
+        // Save user profile changes
+        await this.userRepo.save(user);
+
+        return {
+            status: 200,
+            message: 'Profile update was successful',
+        };
+    } catch (error) {
+        throw new InternalServerErrorException('Failed to update profile');
+    }
+}
+
+
+  async uploadProfileImage(imageKey: string, image: string){
+  
+       const imageData = await this.fileUploadService.uploadProfilePhoto(
+         imageKey || '',
+          image,
+        );
+
+      if (!imageData) throw new Error();
+
+      return imageData
+
   }
 }

@@ -20,6 +20,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { ProfileDto } from 'src/libs/dto/profile.dto';
 
 @ApiTags('User Manager')
 @Controller('user')
@@ -64,7 +65,7 @@ export class UserController {
     return this.userService.getCurrentUser(username);
   }
 
-  @Patch('update/:username')
+  @Patch('update/:userId')
   @ApiBearerAuth('Bearer')
   @ApiOperation({
     summary:
@@ -79,10 +80,31 @@ export class UserController {
   })
   @UseGuards(JwtAuthGuard)
   updateCurrentUser(
-    @Param('username') username: string,
+    @Param('userId') userId: string,
     @Body(ValidationPipe) updateUserDto: UpdateUserDto,
   ) {
-    return this.userService.update(username, updateUserDto);
+    return this.userService.update(userId, updateUserDto);
+  }
+
+  @Patch('set-update-profile/:userId')
+  @ApiBearerAuth('Bearer')
+  @ApiOperation({
+    summary:
+      'Give that user a makeover! Time for an upgrade, like a software spa day. 💻✨',
+  })
+  @ApiUnauthorizedResponse({
+    description:
+      'Are you trying to hack my secrets without the secret handshake? Nice try, but no JWT, no entry!',
+  })
+  @ApiOkResponse({
+    description: 'High-five! Your mission? Totally aced it! 🚀',
+  })
+  @UseGuards(JwtAuthGuard)
+  setOrUpdateCurrentUserPofile(
+    @Param('userId') userId: string,
+    @Body(ValidationPipe) profileDto: ProfileDto,
+  ) {
+    return this.userService.setOrUpdateUserProfile(userId, profileDto);
   }
 
   @ApiBearerAuth('Bearer')
@@ -141,8 +163,8 @@ export class UserController {
     return this.userService.getProductsInCart(userId);
   }
 
-  // @ApiBearerAuth('Bearer')
-  // @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('Bearer')
+  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({
     description: 'Send Notification',
   })

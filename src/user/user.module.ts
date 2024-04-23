@@ -6,10 +6,12 @@ import { User } from '../libs/typeorm/user.entity';
 import { ProductModule } from 'src/product/product.module';
 import { Product } from 'src/libs/typeorm/product.entity';
 import { NotificationModule } from 'src/notification/notification.module';
+import { FileUploadModule } from 'src/file-upload/file-upload.module';
 
 @Module({
   imports: [
     NotificationModule,
+    FileUploadModule,
     forwardRef(() => ProductModule),
     TypeOrmModule.forFeature([User, Product]),
   ],
