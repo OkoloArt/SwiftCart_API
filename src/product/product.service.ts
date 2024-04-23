@@ -19,6 +19,7 @@ import { calculateAverageRating, totalRatingCount } from 'src/utils';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UploadImageDto } from 'src/libs/dto/upload-image.dto';
 import { SimpleUserInfo } from 'src/libs/interfaces/simple-user-info.interface';
+import { map } from 'rxjs';
 const sharp = require('sharp');
 
 @Injectable()
@@ -75,7 +76,7 @@ export class ProductService {
   async getAllProducts() {
     const products = await this.productRepo.find();
 
-    const productWithMappedUser = products.map((product) => {
+    const mappedProduct = products.map((product) => {
       return {
         id: product.id,
         name: product.name,
@@ -85,7 +86,10 @@ export class ProductService {
       };
     });
 
-    return productWithMappedUser;
+    return {
+      itemCount: products.length,
+      products: mappedProduct
+    };
   }
 
   async getProduct(productId: string): Promise<Product> {
