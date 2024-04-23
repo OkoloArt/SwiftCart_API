@@ -30,7 +30,10 @@ export class AuthService {
       const hashPassword = await bcrypt.hash(password, 10);
       await this.userService.create({ ...rest, password: hashPassword });
 
-      return rest;
+      return {
+        status: 200,
+        message: 'User created successfully'
+      };
     } catch (error) {
       throw new Error('Failed to register user');
     }
@@ -50,6 +53,7 @@ export class AuthService {
 
     const token = this.generateToken(user);
     return {
+      status: 200,
       message: 'Login successful',
       access_token: token,
     };
