@@ -51,10 +51,10 @@ export class UserService {
     };
   }
 
-  async findAll(): Promise<Omit<User, 'password'>[]> {
+  async findAll(): Promise<Omit<User, 'password'| 'profile' | 'createdAt' | 'updatedAt' | 'userCart' | 'userRole'>[]> {
     const allUsers = await this.userRepo.find();
 
-    const usersWithoutPasswords = allUsers.map(({ password, ...rest }) => rest);
+    const usersWithoutPasswords = allUsers.map(({ password, profile, createdAt, updatedAt, userCart, userRole,  ...rest }) => rest);
 
     return usersWithoutPasswords;
   }
