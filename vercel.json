@@ -13,13 +13,6 @@
         "CLOUDINARY_API_SECRET":"cJ0zH8jy0i7MCKi90sLE6oHGzL0",
         "CLOUDINARY_API_KEY":"114588383121158"
     },
-
-    "builds": [
-      {
-        "src": "src/main.ts",
-        "use": "@vercel/node"
-      }
-    ],
     
     "routes": [
       {
