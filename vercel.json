@@ -1,0 +1,31 @@
+{
+    "version": 2,
+
+    "env": {
+        "DB_HOST":"ep-holy-mud-a5pgra22.us-east-2.aws.neon.tech",
+        "DB_PORT":5432,
+        "DB_USERNAME":"okoloarthur4",
+        "DB_PASSWORD":"qu0sWQiH2ePh",
+        "DB_NAME":"userDb",
+        "ENDPOINT_ID":"ep-holy-mud-a5pgra22",
+        "JWT-SECRET":"Deathg0d",
+        "CLOUDINARY_CLOUD_NAME":"dwjde2mmh",
+        "CLOUDINARY_API_SECRET":"cJ0zH8jy0i7MCKi90sLE6oHGzL0",
+        "CLOUDINARY_API_KEY":114588383121158
+    },
+
+    "builds": [
+      {
+        "src": "src/main.ts",
+        "use": "@vercel/node"
+      }
+    ],
+    
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "src/main.ts",
+        "methods": ["GET", "POST", "PUT", "DELETE"]
+      }
+    ]
+  }
