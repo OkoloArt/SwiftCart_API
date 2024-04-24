@@ -8,7 +8,7 @@
         "DB_PASSWORD":"qu0sWQiH2ePh",
         "DB_NAME":"userDb",
         "ENDPOINT_ID":"ep-holy-mud-a5pgra22",
-        "JWT-SECRET":"Deathg0d",
+        "JWT_SECRET":"Deathg0d",
         "CLOUDINARY_CLOUD_NAME":"dwjde2mmh",
         "CLOUDINARY_API_SECRET":"cJ0zH8jy0i7MCKi90sLE6oHGzL0",
         "CLOUDINARY_API_KEY":"114588383121158"
