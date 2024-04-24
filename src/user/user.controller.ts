@@ -61,8 +61,8 @@ export class UserController {
   })
   @Get('current')
   getProfile(@Request() req: any) {
-    const { username } = req.user;
-    return this.userService.getCurrentUser(username);
+    const { sub } = req.user;
+    return this.userService.getCurrentUser(sub);
   }
 
   @Patch('update/:userId')
@@ -120,9 +120,10 @@ export class UserController {
       "Say goodbye to your digital doppelganger! Confirm only if you're ready to part ways with your virtual twin. 🚀👋",
   })
   @UseGuards(JwtAuthGuard)
-  @Delete('delete/:username')
-  deleteCurrentUser(@Param('username') username: string) {
-    return this.userService.remove(username);
+  @Delete('delete/:id')
+  deleteCurrentUser(@Param('id') userId: string, @Request() req: any) {
+    const { sub }= req.user
+    return this.userService.remove(userId, sub);
   }
 
   @ApiBearerAuth('Bearer')
@@ -137,12 +138,32 @@ export class UserController {
     summary: 'Toss that treasure into your virtual shopping chariot! 🛒💫',
   })
   @UseGuards(JwtAuthGuard)
-  @Get(':id/addToCart')
+  @Get(':id/addToCart/:productId')
   addToCart(
-    @Param('userId') userId: string,
+    @Param('id') userId: string,
     @Param('productId') productId: string,
   ) {
     return this.userService.addToCart(userId, productId);
+  }
+
+  @ApiBearerAuth('Bearer')
+  @ApiOkResponse({
+    description: 'Item removed from your digital shopping chariot! 🛒',
+  })
+  @ApiUnauthorizedResponse({
+    description:
+      'Are you trying to hack my secrets without the secret handshake? Nice try, but no JWT, no entry!',
+  })
+  @ApiOperation({
+    summary: 'Toss that treasure away from your virtual shopping chariot! 🛒💫',
+  })
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/removeFromCart/:productId')
+  removeFromCart(
+    @Param('id') userId: string,
+    @Param('productId') productId: string,
+  ) {
+    return this.userService.removeFromCart(userId, productId);
   }
 
   @ApiBearerAuth('Bearer')
@@ -159,7 +180,7 @@ export class UserController {
   })
   @UseGuards(JwtAuthGuard)
   @Get(':id/getProductsInCart')
-  getProductsInCart(@Param('userId') userId: string) {
+  getProductsInCart(@Param('id') userId: string) {
     return this.userService.getProductsInCart(userId);
   }
 

@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const dotenv = require('dotenv');
-import entities from 'src/libs/typeorm';
 import { DataSource } from 'typeorm';
+import entities from './src/libs/typeorm';
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 

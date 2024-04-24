@@ -81,8 +81,8 @@ export class UserService {
     return user;
   }
 
-  async getCurrentUser(username: string): Promise<Omit<User, 'password'>> {
-    const foundUser = await this.userRepo.findOneBy({ username });
+  async getCurrentUser(userId: string): Promise<Omit<User, 'password'>> {
+    const foundUser = await this.userRepo.findOne({ where: { id: userId } });
 
     if (!foundUser)
       throw new NotFoundException(
@@ -118,13 +118,19 @@ export class UserService {
   }
 
   async remove(
-    username: string,
-  ): Promise<{ status: boolean; message: string }> {
-    const userToDelete = await this.findOne(username);
+    userId: string,
+    id: string
+  ): Promise<{ status: number; message: string }> {
+
+    if (userId !== id) {
+      throw new ConflictException("You cannot delete that which isn't yours");
+    }
+    
+    const userToDelete = await this.getUserById(userId);
 
     await this.userRepo.remove(userToDelete);
     return {
-      status: true,
+      status: 200,
       message: 'User was deleted successfully',
     };
   }
