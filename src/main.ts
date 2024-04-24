@@ -10,7 +10,7 @@ async function bootstrap() {
   "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
   
   const config = new DocumentBuilder()
-    .setTitle('E-commerce Product API')
+    .setTitle('SwiftCart API')
     .setDescription(
       'A robust backend solution for managing products in your online store',
     )
