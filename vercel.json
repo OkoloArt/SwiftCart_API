@@ -11,7 +11,7 @@
         "JWT_SECRET":"Deathg0d",
         "CLOUDINARY_CLOUD_NAME":"dwjde2mmh",
         "CLOUDINARY_API_SECRET":"cJ0zH8jy0i7MCKi90sLE6oHGzL0",
-        "CLOUDINARY_API_KEY":"114588383121158"
+        "CLOUDINARY_API_KEY":114588383121158
     },
 
     "builds": [
