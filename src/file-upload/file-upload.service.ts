@@ -8,7 +8,7 @@ import * as Cloudinary from 'cloudinary';
 import { env } from 'process';
 import { MIMETYPE } from 'src/libs/enums/mime.enum';
 import { ImageData } from 'src/libs/interfaces/image-data.interface';
-import { generateOtp } from 'src/utils/generateOtp.util';
+import { generateOtp } from 'src/libs/utils/generateOtp.util';
 
 @Injectable()
 export class FileUploadService {

@@ -15,7 +15,7 @@ import { Product } from 'src/libs/typeorm/product.entity';
 import { User } from 'src/libs/typeorm/user.entity';
 import { ReviewProductDto } from 'src/libs/dto/review.dto';
 import { Review } from 'src/libs/interfaces/review.interface';
-import { calculateAverageRating, totalRatingCount } from 'src/utils';
+import { calculateAverageRating, totalRatingCount } from 'src/libs/utils';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UploadImageDto } from 'src/libs/dto/upload-image.dto';
 import { SimpleUserInfo } from 'src/libs/interfaces/simple-user-info.interface';
