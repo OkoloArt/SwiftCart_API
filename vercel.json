@@ -27,5 +27,12 @@
         "dest": "src/main.ts",
         "methods": ["GET", "POST", "PUT", "DELETE"]
       }
+    ],
+
+    "crons": [
+      {
+        "path": "/user/:id/notify-user/:notify",
+        "schedule": "0 0 11 * * *"
+      }
     ]
   }
