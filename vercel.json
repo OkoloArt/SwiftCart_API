@@ -30,7 +30,7 @@
     ],
 
     "functions": {
-      "api/**/*.ts": {
+      "src/**/*.ts": {
         "memory": 1024
       }
     }
