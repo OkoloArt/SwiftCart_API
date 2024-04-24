@@ -11,15 +11,14 @@ import { PasswordUpdateDto, UpdateUserDto } from '../libs/dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { User } from '../libs/typeorm/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcrypt';
-import { ProductService } from 'src/product/product.service';
-import { Product } from 'src/libs/typeorm/product.entity';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
-import { NotificationService } from 'src/notification/notification.service';
-import { FileUploadService } from 'src/file-upload/file-upload.service';
-import { ProfileDto } from 'src/libs/dto/profile.dto';
-import { ImageData } from 'src/libs/interfaces/image-data.interface';
+import { FileUploadService } from '../file-upload/file-upload.service';
+import { ProfileDto } from '../libs/dto/profile.dto';
+import { Product } from '../libs/typeorm/product.entity';
+import { NotificationService } from '../notification/notification.service';
+import { ProductService } from '../product/product.service';
+import { ImageData } from '../libs/interfaces/image-data.interface';
 
 @Injectable()
 export class UserService {

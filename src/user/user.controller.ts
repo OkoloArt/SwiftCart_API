@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from '../libs/dto/update-user.dto';
-import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import {
   ApiBearerAuth,
   ApiOkResponse,
@@ -20,7 +19,8 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { ProfileDto } from 'src/libs/dto/profile.dto';
+import { JwtAuthGuard } from '../auth/guard/jwt.guard';
+import { ProfileDto } from '../libs/dto/profile.dto';
 
 @ApiTags('User Manager')
 @Controller('user')

@@ -8,18 +8,18 @@ import {
 } from '@nestjs/common';
 import { CreateProductDto } from '../libs/dto/create-product.dto';
 import { UpdateProductDto } from '../libs/dto/update-product.dto';
-import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Product } from 'src/libs/typeorm/product.entity';
-import { User } from 'src/libs/typeorm/user.entity';
-import { ReviewProductDto } from 'src/libs/dto/review.dto';
-import { Review } from 'src/libs/interfaces/review.interface';
-import { FileUploadService } from 'src/file-upload/file-upload.service';
-import { UploadImageDto } from 'src/libs/dto/upload-image.dto';
-import { SimpleUserInfo } from 'src/libs/interfaces/simple-user-info.interface';
-import { map } from 'rxjs';
-import { calculateAverageRating, totalRatingCount } from 'src/libs/utils/calculate.utils';
+import { FileUploadService } from '../file-upload/file-upload.service';
+import { ReviewProductDto } from '../libs/dto/review.dto';
+import { UploadImageDto } from '../libs/dto/upload-image.dto';
+import { Review } from '../libs/interfaces/review.interface';
+import { SimpleUserInfo } from '../libs/interfaces/simple-user-info.interface';
+import { Product } from '../libs/typeorm/product.entity';
+import { User } from '../libs/typeorm/user.entity';
+import { calculateAverageRating, totalRatingCount } from '../libs/utils/calculate.utils';
+import { UserService } from '../user/user.service';
+
 const sharp = require('sharp');
 
 @Injectable()

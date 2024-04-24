@@ -1,9 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Attribute } from '../interfaces/attribute.interface';
-import { Rating } from '../interfaces/rating.interface';
-import { Review } from '../interfaces/review.interface';
 import { Specification } from '../interfaces/specification.interface';
-import { IsBase64, IsNumber, IsObject, IsString } from 'class-validator';
+import { IsNumber, IsObject, IsString } from 'class-validator';
 import { UploadImageDto } from './upload-image.dto';
 
 export class CreateProductDto {

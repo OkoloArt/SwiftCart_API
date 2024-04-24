@@ -8,7 +8,8 @@ import {
 import { PaymentService } from './payment.service';
 import { PaymentDto, SubscriptionDto } from '../libs/dto/payment.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
+import { JwtAuthGuard } from '../auth/guard/jwt.guard';
+
 
 @ApiTags('Payment Manager')
 @Controller('payment')

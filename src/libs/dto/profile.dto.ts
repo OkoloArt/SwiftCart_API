@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsNotEmpty, IsEmail, IsEnum, IsPhoneNumber, IsOptional } from "class-validator";
+import { IsString, IsEnum, IsPhoneNumber, IsOptional } from "class-validator";
 import { GENDER } from "../enums/gender.enum";
 
 export class ProfileDto{

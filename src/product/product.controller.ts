@@ -18,11 +18,12 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
-import { ReviewProductDto } from 'src/libs/dto/review.dto';
-import { Roles } from 'src/auth/decorators/role.decorator';
-import { ROLE } from 'src/libs/enums/role.enum';
-import { RolesGuard } from 'src/auth/guard/role.guard';
+import { Roles } from '../auth/decorators/role.decorator';
+import { JwtAuthGuard } from '../auth/guard/jwt.guard';
+import { RolesGuard } from '../auth/guard/role.guard';
+import { ReviewProductDto } from '../libs/dto/review.dto';
+import { ROLE } from '../libs/enums/role.enum';
+
 
 @ApiTags('Product Manager')
 @UseGuards(RolesGuard)

@@ -3,14 +3,12 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
-  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  WsResponse,
 } from '@nestjs/websockets';
 import { Server } from 'http';
-import { Observable, from, map } from 'rxjs';
-import { NotificationDto } from 'src/libs/dto/notification.dto';
+import { NotificationDto } from '../libs/dto/notification.dto';
+
 
 @WebSocketGateway({
   cors: {

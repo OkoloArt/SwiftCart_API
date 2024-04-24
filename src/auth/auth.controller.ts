@@ -1,6 +1,5 @@
 import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserDto } from 'src/libs/dto/create-user.dto';
 import {
   LoginCredentialDto,
   ResetCredentialDto,
@@ -12,6 +11,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { UserDto } from '../libs/dto/create-user.dto';
 
 @ApiTags('Authentication Manager')
 @Controller('auth')

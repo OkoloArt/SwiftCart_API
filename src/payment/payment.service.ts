@@ -3,13 +3,12 @@ import {
   PaymentDto as PaymentDto,
   SubscriptionDto,
 } from '../libs/dto/payment.dto';
-import { UserService } from 'src/user/user.service';
-import { Product } from 'src/libs/typeorm/product.entity';
-import { SubscriptionType } from 'src/libs/enums/subscription.enum';
-import { ROLE } from 'src/libs/enums/role.enum';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/libs/typeorm/user.entity';
 import { Repository } from 'typeorm';
+import { ROLE } from '../libs/enums/role.enum';
+import { SubscriptionType } from '../libs/enums/subscription.enum';
+import { User } from '../libs/typeorm/user.entity';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class PaymentService {
