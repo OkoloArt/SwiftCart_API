@@ -15,7 +15,6 @@ import { Product } from 'src/libs/typeorm/product.entity';
 import { User } from 'src/libs/typeorm/user.entity';
 import { ReviewProductDto } from 'src/libs/dto/review.dto';
 import { Review } from 'src/libs/interfaces/review.interface';
-import { calculateAverageRating, totalRatingCount } from 'src/libs/utils';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UploadImageDto } from 'src/libs/dto/upload-image.dto';
 import { SimpleUserInfo } from 'src/libs/interfaces/simple-user-info.interface';
@@ -203,3 +202,26 @@ export class ProductService {
     }
   }
 }
+
+const calculateAverageRating = (product: Product): number => {
+  if (!product || !product.reviews || product.reviews.length === 0) {
+    return 0;
+  }
+
+  let totalRating = 0;
+  for (const review of product.reviews) {
+    totalRating += review.rating;
+  }
+
+  const averageRating = totalRating / product.reviews.length;
+  return averageRating;
+};
+
+ const totalRatingCount = (product: Product): number => {
+  if (!product || !product.reviews || product.reviews.length === 0) {
+    return 0;
+  }
+
+  return product.reviews.length;
+};
+

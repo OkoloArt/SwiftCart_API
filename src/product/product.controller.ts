@@ -20,7 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import { ReviewProductDto } from 'src/libs/dto/review.dto';
-import { Roles } from 'src/libs/utils/role.decorator';
+import { Roles } from 'src/auth/decorators/role.decorator';
 import { ROLE } from 'src/libs/enums/role.enum';
 import { RolesGuard } from 'src/auth/guard/role.guard';
 
