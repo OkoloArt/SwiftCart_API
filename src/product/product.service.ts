@@ -19,6 +19,7 @@ import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UploadImageDto } from 'src/libs/dto/upload-image.dto';
 import { SimpleUserInfo } from 'src/libs/interfaces/simple-user-info.interface';
 import { map } from 'rxjs';
+import { calculateAverageRating, totalRatingCount } from 'src/libs/utils/calculate.utils';
 const sharp = require('sharp');
 
 @Injectable()
@@ -203,25 +204,4 @@ export class ProductService {
   }
 }
 
-const calculateAverageRating = (product: Product): number => {
-  if (!product || !product.reviews || product.reviews.length === 0) {
-    return 0;
-  }
-
-  let totalRating = 0;
-  for (const review of product.reviews) {
-    totalRating += review.rating;
-  }
-
-  const averageRating = totalRating / product.reviews.length;
-  return averageRating;
-};
-
- const totalRatingCount = (product: Product): number => {
-  if (!product || !product.reviews || product.reviews.length === 0) {
-    return 0;
-  }
-
-  return product.reviews.length;
-};
 

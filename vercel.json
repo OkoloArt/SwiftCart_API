@@ -18,7 +18,9 @@
       {
         "src": "src/main.ts",
         "use": "@vercel/node"
-      }
+      },
+      { "src": "*.js", "use": "@vercel/node" },
+      { "src": "*.ts", "use": "@vercel/node" }
     ],
     
     "routes": [

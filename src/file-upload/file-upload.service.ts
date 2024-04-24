@@ -8,6 +8,7 @@ import * as Cloudinary from 'cloudinary';
 import { env } from 'process';
 import { MIMETYPE } from 'src/libs/enums/mime.enum';
 import { ImageData } from 'src/libs/interfaces/image-data.interface';
+import { generateOtp } from 'src/libs/utils/generateOtp.util';
 
 @Injectable()
 export class FileUploadService {
@@ -131,14 +132,5 @@ export class FileUploadService {
   
 }
 
-const generateOtp = (numOfDigits = 6): string => {
-  let otp = '';
 
-  for (let i = 0; i < numOfDigits; i++) {
-    const extraDigit = Math.round(Math.random() * 9).toString();
-    otp += extraDigit;
-  }
-
-  return otp;
-};
 
