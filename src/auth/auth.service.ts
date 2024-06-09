@@ -32,7 +32,7 @@ export class AuthService {
 
       return {
         status: 200,
-        message: 'User created successfully'
+        message: 'User created successfully',
       };
     } catch (error) {
       throw new Error('Failed to register user');
@@ -52,6 +52,7 @@ export class AuthService {
     }
 
     const token = this.generateToken(user);
+
     return {
       status: 200,
       message: 'Login successful',
