@@ -40,9 +40,9 @@ export class AuthService {
   }
 
   async login(loginCredDto: LoginCredentialDto) {
-    const { username, password } = loginCredDto;
+    const { email, password } = loginCredDto;
 
-    const user = await this.userService.findOne(username);
+    const user = await this.userService.findUserByEmail(email);
     const userPasswordMatch = await bcrypt.compare(password, user.password);
 
     if (!userPasswordMatch) {
@@ -73,9 +73,9 @@ export class AuthService {
   async passwordReset(
     resetCredDto: ResetCredentialDto,
   ): Promise<{ message: string; access_token: string }> {
-    const { username, password, confirmPassword } = resetCredDto;
+    const { email, password, confirmPassword } = resetCredDto;
 
-    const user = await this.userService.findOne(username);
+    const user = await this.userService.findUserByEmail(email);
 
     if (password !== confirmPassword) {
       throw new ConflictException(
@@ -90,7 +90,7 @@ export class AuthService {
         password: hashPassword,
       };
       const updateUserDto = plainToClass(PasswordUpdateDto, updatePassword);
-      await this.userService.update(username, updateUserDto);
+      await this.userService.update(email, updateUserDto);
     } catch (error) {
       throw new InternalServerErrorException('Error resetting password');
     }

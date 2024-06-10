@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { UserDto } from '../libs/dto/create-user.dto';
 import { PasswordUpdateDto, UpdateUserDto } from '../libs/dto/update-user.dto';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { User } from '../libs/typeorm/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SchedulerRegistry } from '@nestjs/schedule';
@@ -32,9 +32,7 @@ export class UserService {
     private readonly fileUploadService: FileUploadService,
   ) {}
 
-  async create(
-    userDto: UserDto,
-  ): Promise<{ status: number; message: string; }> {
+  async create(userDto: UserDto): Promise<{ status: number; message: string }> {
     const { email } = userDto;
     const userExists = await this.findUserByEmail(email);
 
@@ -43,17 +41,37 @@ export class UserService {
     }
 
     const user = this.userRepo.create(userDto);
-  await this.userRepo.save(user);
+    await this.userRepo.save(user);
     return {
       status: 200,
       message: 'User was created successfully',
     };
   }
 
-  async findAll(): Promise<Omit<User, 'password'| 'profile' | 'createdAt' | 'updatedAt' | 'userCart' | 'userRole'>[]> {
+  async findAll(): Promise<
+    Omit<
+      User,
+      | 'password'
+      | 'profile'
+      | 'createdAt'
+      | 'updatedAt'
+      | 'userCart'
+      | 'userRole'
+    >[]
+  > {
     const allUsers = await this.userRepo.find();
 
-    const usersWithoutPasswords = allUsers.map(({ password, profile, createdAt, updatedAt, userCart, userRole,  ...rest }) => rest);
+    const usersWithoutPasswords = allUsers.map(
+      ({
+        password,
+        profile,
+        createdAt,
+        updatedAt,
+        userCart,
+        userRole,
+        ...rest
+      }) => rest,
+    );
 
     return usersWithoutPasswords;
   }
@@ -95,10 +113,10 @@ export class UserService {
   }
 
   async update(
-    userId: string,
+    email: string,
     updateUserDto: UpdateUserDto | PasswordUpdateDto,
   ): Promise<{ message: string; user: Omit<User, 'password'> }> {
-    const user = await this.findOne(userId);
+    const user = await this.findUserByEmail(email);
 
     if ('password' in updateUserDto) {
       // Handle password update logic
@@ -119,13 +137,12 @@ export class UserService {
 
   async remove(
     userId: string,
-    id: string
+    id: string,
   ): Promise<{ status: number; message: string }> {
-
     if (userId !== id) {
       throw new ConflictException("You cannot delete that which isn't yours");
     }
-    
+
     const userToDelete = await this.getUserById(userId);
 
     await this.userRepo.remove(userToDelete);
@@ -136,7 +153,7 @@ export class UserService {
   }
 
   async findUserByEmail(email: string) {
-    return this.userRepo.findOneBy({ email });
+    return this.userRepo.findOneBy({ email: ILike(email) });
   }
 
   async addToCart(userId: string, productId: string) {
@@ -247,61 +264,64 @@ export class UserService {
     }
   }
 
-
   async setOrUpdateUserProfile(userId: string, data: ProfileDto) {
     try {
-        const user = await this.getUserById(userId);
+      const user = await this.getUserById(userId);
 
-        let imageData: ImageData
+      let imageData: ImageData;
 
-        // Upload image if it's not null or empty
-        if (data.image !== '' && data.image !== null && data.image !== undefined) {
-            imageData = await this.uploadProfileImage(user.profile.imageKey, data.image);
-        }
-
-        // If user profile doesn't exist, create a new one
-        if (!user.profile) {
-            user.profile = {
-                address: data.address,
-                country: data.country,
-                mobileNo: Number(data.mobileNo),
-                gender: data.gender,
-                image: imageData?.imageUrl ?? user.profile.image,
-                imageKey: imageData?.imageKey ?? user.profile.imageKey,
-            };
-        } else {
-            // Update user profile with non-null or non-empty values
-            user.profile.image = imageData?.imageUrl ?? user.profile.image;
-            user.profile.imageKey = imageData?.imageKey ?? user.profile.imageKey;
-            user.profile.address = data.address ?? user.profile.address;
-            user.profile.country = data.country ?? user.profile.country;
-            user.profile.mobileNo = Number(data.mobileNo) ?? user.profile.mobileNo;
-            user.profile.gender = data.gender ?? user.profile.gender;
-        }
-
-        // Save user profile changes
-        await this.userRepo.save(user);
-
-        return {
-            status: 200,
-            message: 'Profile update was successful',
-        };
-    } catch (error) {
-        throw new InternalServerErrorException('Failed to update profile');
-    }
-}
-
-
-  async uploadProfileImage(imageKey: string, image: string){
-  
-       const imageData = await this.fileUploadService.uploadProfilePhoto(
-         imageKey || '',
-          image,
+      // Upload image if it's not null or empty
+      if (
+        data.image !== '' &&
+        data.image !== null &&
+        data.image !== undefined
+      ) {
+        imageData = await this.uploadProfileImage(
+          user.profile.imageKey,
+          data.image,
         );
+      }
 
-      if (!imageData) throw new Error();
+      // If user profile doesn't exist, create a new one
+      if (!user.profile) {
+        user.profile = {
+          address: data.address,
+          country: data.country,
+          mobileNo: Number(data.mobileNo),
+          gender: data.gender,
+          image: imageData?.imageUrl ?? user.profile.image,
+          imageKey: imageData?.imageKey ?? user.profile.imageKey,
+        };
+      } else {
+        // Update user profile with non-null or non-empty values
+        user.profile.image = imageData?.imageUrl ?? user.profile.image;
+        user.profile.imageKey = imageData?.imageKey ?? user.profile.imageKey;
+        user.profile.address = data.address ?? user.profile.address;
+        user.profile.country = data.country ?? user.profile.country;
+        user.profile.mobileNo = Number(data.mobileNo) ?? user.profile.mobileNo;
+        user.profile.gender = data.gender ?? user.profile.gender;
+      }
 
-      return imageData
+      // Save user profile changes
+      await this.userRepo.save(user);
 
+      return {
+        status: 200,
+        message: 'Profile update was successful',
+      };
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to update profile');
+    }
+  }
+
+  async uploadProfileImage(imageKey: string, image: string) {
+    const imageData = await this.fileUploadService.uploadProfilePhoto(
+      imageKey || '',
+      image,
+    );
+
+    if (!imageData) throw new Error();
+
+    return imageData;
   }
 }

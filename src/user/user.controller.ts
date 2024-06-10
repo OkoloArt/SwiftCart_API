@@ -65,7 +65,7 @@ export class UserController {
     return this.userService.getCurrentUser(sub);
   }
 
-  @Patch('update/:userId')
+  @Patch('update')
   @ApiBearerAuth('Bearer')
   @ApiOperation({
     summary:
@@ -80,10 +80,11 @@ export class UserController {
   })
   @UseGuards(JwtAuthGuard)
   updateCurrentUser(
-    @Param('userId') userId: string,
+    @Request() req: any,
     @Body(ValidationPipe) updateUserDto: UpdateUserDto,
   ) {
-    return this.userService.update(userId, updateUserDto);
+    const { username } = req.user;
+    return this.userService.update(username, updateUserDto);
   }
 
   @Patch('set-update-profile/:userId')
@@ -122,7 +123,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Delete('delete/:id')
   deleteCurrentUser(@Param('id') userId: string, @Request() req: any) {
-    const { sub }= req.user
+    const { sub } = req.user;
     return this.userService.remove(userId, sub);
   }
 

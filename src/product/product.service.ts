@@ -17,7 +17,10 @@ import { Review } from '../libs/interfaces/review.interface';
 import { SimpleUserInfo } from '../libs/interfaces/simple-user-info.interface';
 import { Product } from '../libs/typeorm/product.entity';
 import { User } from '../libs/typeorm/user.entity';
-import { calculateAverageRating, totalRatingCount } from '../libs/utils/calculate.utils';
+import {
+  calculateAverageRating,
+  totalRatingCount,
+} from '../libs/utils/calculate.utils';
 import { UserService } from '../user/user.service';
 
 const sharp = require('sharp');
@@ -39,7 +42,7 @@ export class ProductService {
     createProductDto: CreateProductDto,
     data: UploadImageDto,
   ): Promise<{ status: number; description: string }> {
-    const user = await this.userService.findOne(userId);
+    const user = await this.userService.getUserById(userId);
 
     const { base64 } = data;
 
@@ -88,7 +91,7 @@ export class ProductService {
 
     return {
       itemCount: products.length,
-      products: mappedProduct
+      products: mappedProduct,
     };
   }
 
@@ -128,7 +131,7 @@ export class ProductService {
   }
 
   async remove(userId: string, productId: string) {
-    const user = await this.userService.findOne(userId);
+    const user = await this.userService.getUserById(userId);
     const product = await this.getProduct(productId);
 
     if (user.username !== product.user.username) {
@@ -145,7 +148,7 @@ export class ProductService {
     reviewProductDto: ReviewProductDto,
   ) {
     const { userRating, userComment } = reviewProductDto;
-    const user = await this.userService.findOne(userId);
+    const user = await this.userService.getUserById(userId);
     const product = await this.getProduct(productId);
 
     if (user.username === product.user.username) {
@@ -203,5 +206,3 @@ export class ProductService {
     }
   }
 }
-
-

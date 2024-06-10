@@ -7,7 +7,7 @@ export class LoginCredentialDto {
   @ApiProperty({
     type: String,
   })
-  username: string;
+  email: string;
 
   @IsNotEmpty()
   @IsString()
