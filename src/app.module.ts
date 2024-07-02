@@ -20,12 +20,6 @@ import { PaymentModule } from './payment/payment.module';
     ScheduleModule.forRoot(),
     PaymentModule,
   ],
-  providers: [
-    FileUploadService,
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
-  ],
+  providers: [FileUploadService],
 })
 export class AppModule {}

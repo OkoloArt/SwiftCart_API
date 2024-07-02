@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  Logger,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductWithImageDto } from '../libs/dto/create-product.dto';
@@ -24,9 +25,7 @@ import { RolesGuard } from '../auth/guard/role.guard';
 import { ReviewProductDto } from '../libs/dto/review.dto';
 import { ROLE } from '../libs/enums/role.enum';
 
-
 @ApiTags('Product Manager')
-@UseGuards(RolesGuard)
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -40,16 +39,16 @@ export class ProductController {
       'Unable to access if the user isn\'t a "SELLER" or missing a JWT ',
   })
   @ApiBearerAuth('Bearer')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('add-product')
   @Roles(ROLE.SELLER)
   addProduct(
     @Request() req: any,
     @Body() createProductWithImageDto: CreateProductWithImageDto,
   ) {
-    const { id } = req.user;
+    const { sub } = req.user;
     const { createProductDto, uploadImageDto } = createProductWithImageDto;
-    return this.productService.create(id, createProductDto, uploadImageDto);
+    return this.productService.create(sub, createProductDto, uploadImageDto);
   }
 
   @ApiOperation({
@@ -109,8 +108,8 @@ export class ProductController {
     description: 'Unable to access if the user is missing a JWT ',
   })
   deleteProduct(@Param('id') productId: string, @Request() req: any) {
-    const { username } = req.user;
-    return this.productService.remove(username, productId);
+    const { id } = req.user;
+    return this.productService.remove(id, productId);
   }
 
   @ApiBearerAuth('Bearer')

@@ -15,7 +15,7 @@ export class CreateProductDto {
 
   @ApiProperty() @IsNumber() quantity: number;
 
-  @ApiProperty() @IsObject() attributes?: Attribute[];
+  @ApiProperty({ type: [Attribute] }) @IsObject() attributes?: Attribute[];
 
   @ApiProperty() @IsObject() specifications?: Specification;
 }

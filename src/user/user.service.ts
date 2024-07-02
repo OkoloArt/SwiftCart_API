@@ -89,8 +89,8 @@ export class UserService {
     return foundUser;
   }
 
-  async getUserById(id: string): Promise<User> {
-    const user = await this.userRepo.findOne({ where: { id } });
+  async getUserById(userId: string): Promise<User> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException(
         'Whoopsie! 🧙‍♂️ No magic user here! Stir up some registration potion and join the fun. See you in the enchanted user realm! ✨',

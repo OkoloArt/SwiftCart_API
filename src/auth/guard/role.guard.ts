@@ -1,11 +1,16 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  Logger,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLE } from '../../libs/enums/role.enum';
 import { ROLES_KEY } from '../decorators/role.decorator';
 
-
 @Injectable()
 export class RolesGuard implements CanActivate {
+  private readonly logger = new Logger(RolesGuard.name);
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
@@ -13,15 +18,18 @@ export class RolesGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
+
     if (!requiredRole) {
       return true;
     }
+
     const { user } = context.switchToHttp().getRequest();
-    if (!user || !user.role) {
+
+    if (!user || !user.userRole) {
       // If user or user.role is not defined, deny access
       return false;
     }
 
-    return user.role === requiredRole;
+    return user.userRole === requiredRole;
   }
 }

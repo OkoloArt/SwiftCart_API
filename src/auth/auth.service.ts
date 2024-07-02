@@ -51,7 +51,7 @@ export class AuthService {
       );
     }
 
-    const token = this.generateToken(user);
+    const token = await this.generateToken(user);
 
     return {
       status: 200,
@@ -66,9 +66,9 @@ export class AuthService {
       sub: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
-      role: user.userRole,
+      userRole: user.userRole,
     };
-    return this.jwtService.sign(payload);
+    return this.jwtService.signAsync(payload);
   }
 
   async passwordReset(
@@ -96,7 +96,7 @@ export class AuthService {
       throw new InternalServerErrorException('Error resetting password');
     }
 
-    const token = this.generateToken(user);
+    const token = await this.generateToken(user);
     return {
       message: 'Password reset successful',
       access_token: token,
