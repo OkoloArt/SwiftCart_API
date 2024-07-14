@@ -127,7 +127,7 @@ export class ProductController {
     @Request() req: any,
     @Body() reviewProductDto: ReviewProductDto,
   ) {
-    const { username } = req.user;
-    return this.productService.addReview(username, productId, reviewProductDto);
+    const { sub } = req.user;
+    return this.productService.addReview(sub, productId, reviewProductDto);
   }
 }
