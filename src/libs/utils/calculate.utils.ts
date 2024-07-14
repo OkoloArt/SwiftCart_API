@@ -7,7 +7,7 @@ export const calculateAverageRating = (product: Product): number => {
 
   let totalRating = 0;
   for (const review of product.reviews) {
-    totalRating += review.rating;
+    totalRating += review.rating / 2;
   }
 
   const averageRating = totalRating / product.reviews.length;
