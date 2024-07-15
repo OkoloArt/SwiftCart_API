@@ -11,7 +11,9 @@ export const calculateAverageRating = (product: Product): number => {
   }
 
   const averageRating = totalRating / product.reviews.length;
-  return Math.max(0, Math.min(averageRating, 5));
+  const clampedRating = Math.max(0, Math.min(averageRating, 5));
+
+  return Math.round(clampedRating * 10) / 10;
 };
 
 export const totalRatingCount = (product: Product): number => {
