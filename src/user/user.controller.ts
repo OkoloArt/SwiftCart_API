@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Controller,
   Get,
@@ -87,7 +88,7 @@ export class UserController {
     return this.userService.update(username, updateUserDto);
   }
 
-  @Patch('set-update-profile/:userId')
+  @Patch('set-update-profile')
   @ApiBearerAuth('Bearer')
   @ApiOperation({
     summary:
@@ -102,10 +103,11 @@ export class UserController {
   })
   @UseGuards(JwtAuthGuard)
   setOrUpdateCurrentUserPofile(
-    @Param('userId') userId: string,
+    @Request() req: any,
     @Body(ValidationPipe) profileDto: ProfileDto,
   ) {
-    return this.userService.setOrUpdateUserProfile(userId, profileDto);
+    const { sub } = req.user;
+    return this.userService.setOrUpdateUserProfile(sub, profileDto);
   }
 
   @ApiBearerAuth('Bearer')
@@ -139,12 +141,10 @@ export class UserController {
     summary: 'Toss that treasure into your virtual shopping chariot! 🛒💫',
   })
   @UseGuards(JwtAuthGuard)
-  @Get(':id/addToCart/:productId')
-  addToCart(
-    @Param('id') userId: string,
-    @Param('productId') productId: string,
-  ) {
-    return this.userService.addToCart(userId, productId);
+  @Get('addToCart/:productId')
+  addToCart(@Request() req: any, @Param('productId') productId: string) {
+    const { sub } = req.user;
+    return this.userService.addToCart(sub, productId);
   }
 
   @ApiBearerAuth('Bearer')
@@ -159,12 +159,10 @@ export class UserController {
     summary: 'Toss that treasure away from your virtual shopping chariot! 🛒💫',
   })
   @UseGuards(JwtAuthGuard)
-  @Get(':id/removeFromCart/:productId')
-  removeFromCart(
-    @Param('id') userId: string,
-    @Param('productId') productId: string,
-  ) {
-    return this.userService.removeFromCart(userId, productId);
+  @Get('removeFromCart/:productId')
+  removeFromCart(@Request() req: any, @Param('productId') productId: string) {
+    const { sub } = req.user;
+    return this.userService.removeFromCart(sub, productId);
   }
 
   @ApiBearerAuth('Bearer')
@@ -180,9 +178,10 @@ export class UserController {
       "Hey there, want a peek at your cart's loot? Here's the juicy list of goodies waiting for checkout! 🛒✨",
   })
   @UseGuards(JwtAuthGuard)
-  @Get(':id/getProductsInCart')
-  getProductsInCart(@Param('id') userId: string) {
-    return this.userService.getProductsInCart(userId);
+  @Get('getProductsInCart')
+  getProductsInCart(@Request() req: any) {
+    const { sub } = req.user;
+    return this.userService.getProductsInCart(sub);
   }
 
   @ApiBearerAuth('Bearer')
@@ -197,12 +196,13 @@ export class UserController {
   @ApiOperation({
     summary: 'Sending notifications when there are items in the cart! 🛒✨',
   })
-  @Get(':id/notify-user/:notify')
+  @Get('notify-user/:notify')
   async sendNotification(
-    @Param('id') userId: string,
+    @Request() req: any,
     @Param('notify', ParseBoolPipe) shouldNotify: boolean,
   ) {
     // Call the appropriate method in the userService to send notification to user
-    return this.userService.notifyUser(userId, shouldNotify);
+    const { sub } = req.user;
+    return this.userService.notifyUser(sub, shouldNotify);
   }
 }
