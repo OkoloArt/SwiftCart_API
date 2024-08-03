@@ -231,6 +231,7 @@ export class UserService {
         id: product.id,
         name: product.name,
         price: product.price,
+        ratings: (product.ratings && product.ratings.average) || 0,
         image: product.images[0],
       };
     });
