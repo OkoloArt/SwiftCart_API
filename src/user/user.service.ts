@@ -202,39 +202,31 @@ export class UserService {
     };
   }
 
-  async getProductsInCart(
-    userId: string,
-  ): Promise<Product[] | { message: string }> {
+  async getProductsInCart(userId: string) {
     const user = await this.getUserById(userId);
     const products: Product[] = [];
 
-    if (user.userCart === null) {
+    if (!user.userCart || user.userCart.length === 0) {
       return {
-        message:
-          "Oopsie! Your cart feels a bit lonely. Toss in a product and let's get this shopping party started",
-      };
-    }
-
-    if (user.userCart.length === 0) {
-      return {
-        message:
-          "Oopsie! Your cart feels a bit lonely. Toss in a product and let's get this shopping party started",
+        itemCount: 0,
+        products: [],
       };
     }
 
     for (const productId of user.userCart) {
-      products.push(await this.productService.getProduct(productId));
+      const product = await this.productService.getProduct(productId);
+      if (product) {
+        products.push(product);
+      }
     }
 
-    const mappedProduct = products.map((product) => {
-      return {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        ratings: (product.ratings && product.ratings.average) || 0,
-        image: product.images[0],
-      };
-    });
+    const mappedProduct = products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      ratings: (product.ratings && product.ratings.average) || 0,
+      image: product.images[0],
+    }));
 
     return {
       itemCount: products.length,
