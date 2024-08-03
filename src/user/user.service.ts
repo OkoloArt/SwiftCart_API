@@ -206,7 +206,7 @@ export class UserService {
     userId: string,
   ): Promise<Product[] | { message: string }> {
     const user = await this.getUserById(userId);
-    const product: Product[] = [];
+    const products: Product[] = [];
 
     if (user.userCart === null) {
       return {
@@ -223,10 +223,22 @@ export class UserService {
     }
 
     for (const productId of user.userCart) {
-      product.push(await this.productService.getProduct(productId));
+      products.push(await this.productService.getProduct(productId));
     }
 
-    return product;
+    const mappedProduct = products.map((product) => {
+      return {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.images[0],
+      };
+    });
+
+    return {
+      itemCount: products.length,
+      products: mappedProduct,
+    };
   }
 
   async notifyUser(userId: string, shouldNotify: boolean) {
