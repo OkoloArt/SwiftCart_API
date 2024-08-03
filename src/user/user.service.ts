@@ -157,11 +157,23 @@ export class UserService {
   }
 
   async addToCart(userId: string, productId: string) {
+    // Fetch the user from the database
     const user = await this.getUserById(userId);
 
+    // Initialize the user's cart if it doesn't exist
     user.userCart = user.userCart || [];
+
+    // Check if the productId is already in the cart
+    if (user.userCart.includes(productId)) {
+      return {
+        message: 'Product is already in the cart',
+      };
+    }
+
+    // Add the productId to the cart
     user.userCart.push(productId);
 
+    // Save the user with the updated cart
     await this.userRepo.save(user);
 
     return {
